@@ -1,5 +1,32 @@
 const { Pool } = require('@neondatabase/serverless');
 
+// Malaysia is a fixed UTC+8 offset year-round (no daylight saving), so we
+// can format display dates deterministically without any timezone library.
+function formatDateTime(d) {
+  if (!d) return '';
+  const date = new Date(d);
+  const kl = new Date(date.getTime() + 8 * 60 * 60 * 1000);
+  const pad = n => String(n).padStart(2, '0');
+  const day = pad(kl.getUTCDate());
+  const month = pad(kl.getUTCMonth() + 1);
+  const year = kl.getUTCFullYear();
+  let hour = kl.getUTCHours();
+  const minute = pad(kl.getUTCMinutes());
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  return `${day}.${month}.${year} ${pad(hour)}.${minute}${ampm}`;
+}
+
+// date_received comes back from SQL as a plain "YYYY-MM-DD" string
+// (see to_char() in SELECT_COLUMNS below) — just reformat it to match
+// the "dd.MM.yyyy" style the rest of the app already displays.
+function formatDateOnly(dateStr) {
+  if (!dateStr) return '';
+  const [y, m, d] = dateStr.split('-');
+  return `${d}.${m}.${y}`;
+}
+
 // Explicit column list (rather than SELECT *) so we can force
 // date_received to a plain "YYYY-MM-DD" string via to_char(). Without
 // this, the driver can hand back a Date object for plain DATE columns
@@ -20,14 +47,15 @@ function rowToObject(r) {
     sub_department: r.sub_department,
     inv_odo_no: r.inv_odo_no,
     po_no: r.po_no,
-    date_received: r.date_received,
+    date: formatDateTime(r.created_at),             // matches the old Sheets "DATE" column display
+    date_received: formatDateOnly(r.date_received),  // "dd.MM.yyyy", matches the old format
     total_carton: r.total_carton,
     total_amount: r.total_amount,
     record_by: r.record_by,
     key_in_by: r.key_in_by,
-    date_key_in: r.date_key_in ? new Date(r.date_key_in).toISOString() : '',
+    date_key_in: formatDateTime(r.date_key_in),      // matches the old Sheets "DATE KEY IN" display
     status: r.status,
-    created_at: new Date(r.created_at).toISOString(),
+    created_at: r.created_at ? new Date(r.created_at).toISOString() : '',
     completed_at: r.completed_at ? new Date(r.completed_at).toISOString() : ''
   };
 }
