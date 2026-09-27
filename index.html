@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHBN Departmental Invoice Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#4A2E39;
+    --leather:#D98CA3;
+    --leather-dark:#B96C87;
+    --paper:#FDF1F5;
+    --paper-line:#F5D9E3;
+    --brass:#E8A9BB;
+    --stamp-red:#C2456B;
+    --stamp-green:#5B9279;
+    --muted:#9C7885;
+    --danger:#C2456B;
+    --radius:10px;
+    --shadow: 0 6px 20px rgba(185,108,135,0.22);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Inter',sans-serif;
+    background:var(--leather-dark);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  .app-shell{
+    max-width:1240px;
+    margin:0 auto;
+    min-height:100vh;
+    background:
+      repeating-linear-gradient(var(--paper), var(--paper) 27px, var(--paper-line) 28px),
+      var(--paper);
+    box-shadow: var(--shadow);
+    position:relative;
+  }
+  header.title-band{
+    background:var(--leather);
+    color:var(--paper);
+    padding:22px 24px 18px;
+    border-bottom:4px double var(--brass);
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  header.title-band h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:1.5rem;
+    margin:0;
+    letter-spacing:0.02em;
+  }
+  header.title-band .sub{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.72rem;
+    color:#F7DEE7;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+  nav.tabs{
+    display:flex;
+    background:var(--leather-dark);
+    padding:0 12px;
+    gap:4px;
+    overflow-x:auto;
+  }
+  nav.tabs button{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:0.92rem;
+    color:#F7DEE7;
+    background:#C77E97;
+    border:none;
+    padding:12px 20px 10px;
+    border-radius:8px 8px 0 0;
+    cursor:pointer;
+    position:relative;
+    top:2px;
+    white-space:nowrap;
+  }
+  nav.tabs button.active{
+    background:var(--paper);
+    color:var(--leather);
+  }
+  main{ padding:24px; }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  .card{
+    background:#FFF8FA;
+    border:1px solid var(--paper-line);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:0 2px 6px rgba(185,108,135,0.10);
+    margin-bottom:18px;
+  }
+  h2.section-title{
+    font-family:'Fraunces',serif;
+    font-size:1.15rem;
+    color:var(--leather);
+    margin:0 0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .field-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 16px;
+  }
+  @media (max-width:560px){ .field-grid{grid-template-columns:1fr;} }
+  label{
+    display:block;
+    font-size:0.72rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--muted);
+    margin-bottom:5px;
+  }
+  label .req{ color:var(--stamp-red); }
+  input, select{
+    width:100%;
+    padding:10px 11px;
+    border:1px solid #E8C4D1;
+    border-radius:6px;
+    background:#fff;
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.92rem;
+    color:var(--ink);
+  }
+  input:focus, select:focus, button:focus-visible{
+    outline:2px solid var(--brass);
+    outline-offset:1px;
+  }
+  input[readonly]{ background:#F7E4EB; color:#6b4a57; }
+  .btn{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.88rem;
+    padding:11px 20px;
+    border-radius:7px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-primary{ background:var(--leather); color:var(--paper); }
+  .btn-primary:hover{ background:var(--leather-dark); }
+  .btn-ghost{ background:transparent; color:var(--leather); border:1px solid var(--leather); }
+  .btn-danger{ background:var(--stamp-red); color:#fff; }
+  .btn-small{ padding:6px 12px; font-size:0.78rem; }
+  .actions-row{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+  .msg{ font-size:0.85rem; margin-top:10px; min-height:18px; }
+  .msg.error{ color:var(--stamp-red); }
+  .msg.ok{ color:var(--stamp-green); }
+
+  .subtabs{ display:flex; gap:8px; margin-bottom:16px; }
+  .subtabs button{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:0.82rem;
+    padding:8px 16px;
+    border-radius:20px;
+    border:1px solid var(--leather);
+    background:transparent;
+    color:var(--leather);
+    cursor:pointer;
+  }
+  .subtabs button.active{ background:var(--leather); color:var(--paper); }
+
+  .dept-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .dept-row button{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:0.85rem;
+    padding:9px 18px;
+    border-radius:20px;
+    border:1.5px solid var(--leather);
+    background:#fff;
+    color:var(--leather);
+    cursor:pointer;
+  }
+  .dept-row button.active{ background:var(--leather); color:var(--paper); }
+  #pending-search{ margin-bottom:14px; }
+  .blink-notice{
+    color:var(--stamp-red);
+    font-weight:700;
+    font-family:'Inter',sans-serif;
+    font-size:0.85rem;
+    margin-bottom:14px;
+    animation: blinker 1.1s linear infinite;
+    display:none;
+  }
+  .blink-notice.show{ display:block; }
+  @keyframes blinker{ 50% { opacity:0.15; } }
+
+  .bucket-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .bucket-row button{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.75rem;
+    padding:6px 12px;
+    border-radius:5px;
+    border:1px solid var(--brass);
+    background:#fff;
+    color:var(--leather);
+    cursor:pointer;
+  }
+  .bucket-row button.active{ background:var(--brass); color:#fff; }
+
+  ul.record-list{ list-style:none; margin:0; padding:0; }
+  ul.record-list li{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 14px;
+    border-bottom:1px dashed var(--paper-line);
+    cursor:pointer;
+  }
+  ul.record-list li:hover{ background:#FBE4EC; }
+  ul.record-list li .inv-no{
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    color:var(--leather);
+  }
+  ul.record-list li .meta{
+    font-size:0.76rem;
+    color:var(--muted);
+  }
+  .stamp{
+    font-family:'JetBrains Mono',monospace;
+    font-size:0.65rem;
+    font-weight:700;
+    letter-spacing:0.08em;
+    padding:3px 9px;
+    border:2px solid currentColor;
+    border-radius:4px;
+    transform:rotate(-4deg);
+    display:inline-block;
+  }
+  .stamp.pending{ color:var(--brass); }
+  .stamp.completed{ color:var(--stamp-green); }
+  .empty-note{ color:var(--muted); font-size:0.85rem; padding:16px 4px; }
+
+  .modal-backdrop{
+    display:none;
+    position:fixed; inset:0;
+    background:rgba(80,40,55,0.55);
+    align-items:center; justify-content:center;
+    padding:16px;
+    z-index:50;
+  }
+  .modal-backdrop.active{ display:flex; }
+  .modal{
+    background:var(--paper);
+    border-radius:var(--radius);
+    max-width:560px;
+    width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    padding:22px;
+    box-shadow:var(--shadow);
+  }
+  .modal-header{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:14px;
+  }
+  .modal-header h3{
+    font-family:'Fraunces',serif; margin:0; color:var(--leather); font-size:1.1rem;
+  }
+  .icon-btn{
+    background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--leather);
+  }
+  .close-x{ font-size:1.4rem; line-height:1; color:var(--muted); background:none; border:none; cursor:pointer; }
+
+  .lock-screen{ text-align:center; padding:60px 20px; }
+  .lock-screen input{ max-width:200px; margin:14px auto; text-align:center; letter-spacing:0.3em; }
+  .confirm-box{ text-align:center; }
+  .confirm-box input{ text-align:center; margin-top:10px; }
+
+  .admin-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px dashed var(--paper-line); }
+  .admin-row .info{ font-size:0.8rem; }
+  .admin-row .inv-no{ font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--leather); }
+
+  .report-controls{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; }
+  .report-controls > div{ min-width:150px; }
+  .printable-area{ overflow-x:auto; }
+  .printable-area table{ width:100%; min-width:900px; border-collapse:collapse; font-size:0.76rem; }
+  .printable-area th{
+    text-align:left; padding:7px 5px; border-bottom:2px solid var(--leather);
+    font-family:'Inter',sans-serif; text-transform:uppercase; font-size:0.68rem; letter-spacing:0.04em; color:var(--leather);
+  }
+  .printable-area td{ padding:6px 5px; border-bottom:1px dashed var(--paper-line); font-family:'JetBrains Mono',monospace; }
+  .printable-area .status-pending{ color:var(--brass); font-weight:700; }
+  .printable-area .status-completed{ color:var(--stamp-green); font-weight:700; }
+  .printable-area .report-heading{ text-align:center; margin-bottom:16px; }
+  .printable-area .report-heading h3{ font-family:'Fraunces',serif; color:var(--leather); margin:0 0 4px; font-size:1.2rem; }
+  .printable-area .report-range-label{ font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--muted); }
+  .grand-total{
+    margin-top:16px; padding-top:14px; border-top:2px solid var(--leather);
+    text-align:right; font-family:'Fraunces',serif; font-size:1.1rem; color:var(--leather); font-weight:600;
+  }
+  .grand-total span{ font-family:'JetBrains Mono',monospace; margin-left:8px; }
+
+  .list-toggle-row{ display:flex; justify-content:flex-end; margin-bottom:8px; }
+  .brand-input{ display:none; }
+
+  @media print{
+    body *{ visibility:hidden; }
+    .printable-area, .printable-area *{ visibility:visible; }
+    .printable-area{ position:absolute; top:0; left:0; width:100%; }
+    .no-print{ display:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <header class="title-band">
+    <h1>Departmental Invoice Record</h1>
+    <div class="sub">SHBN &middot; Ledger No. Live</div>
+  </header>
+
+  <nav class="tabs">
+    <button data-tab="new" class="active">New Entry</button>
+    <button data-tab="pending">Pending Invoice</button>
+    <button data-tab="summary">Invoice Summary</button>
+    <button data-tab="admin">Admin</button>
+  </nav>
+
+  <main>
+
+    <!-- NEW ENTRY -->
+    <section id="panel-new" class="panel active">
+      <div class="card">
+        <h2 class="section-title">New Invoice Entry</h2>
+        <div class="field-grid">
+          <div>
+            <label>Supplier <span class="req">*</span></label>
+            <input type="text" id="f-supplier" class="uc">
+          </div>
+          <div>
+            <label>Main Department <span class="req">*</span></label>
+            <select id="f-main-dept">
+              <option value="">-- SELECT --</option>
+              <option value="HARDLINE">HARDLINE</option>
+              <option value="SOFTLINE">SOFTLINE</option>
+              <option value="EG">EG</option>
+              <option value="CONSIGNMENT">CONSIGNMENT</option>
+            </select>
+          </div>
+          <div>
+            <label>Sub-Department / Brand <span class="req">*</span></label>
+            <select id="f-sub-dept-select" disabled></select>
+            <input type="text" id="f-sub-dept-input" class="uc brand-input" placeholder="ENTER BRAND NAME">
+          </div>
+          <div>
+            <label>Inv / ODO No <span class="req">*</span></label>
+            <input type="text" id="f-inv" class="uc">
+          </div>
+          <div>
+            <label>PO No <span class="req">*</span></label>
+            <input type="text" id="f-po" class="uc">
+          </div>
+          <div>
+            <label>Date of Received <span class="req">*</span></label>
+            <input type="date" id="f-date-received">
+          </div>
+          <div>
+            <label>Total Carton</label>
+            <input type="number" step="any" id="f-carton">
+          </div>
+          <div>
+            <label>Total Amount</label>
+            <input type="number" step="any" id="f-amount">
+          </div>
+          <div>
+            <label>Record By <span class="req">*</span></label>
+            <input type="text" id="f-recordby" class="uc">
+          </div>
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-primary" id="btn-submit-new">Submit Entry</button>
+        </div>
+        <div class="msg" id="new-msg"></div>
+      </div>
+    </section>
+
+    <!-- PENDING / COMPLETED -->
+    <section id="panel-pending" class="panel">
+      <div class="subtabs">
+        <button data-sub="pending" class="active">Pending</button>
+        <button data-sub="completed">Completed</button>
+      </div>
+
+      <div id="sub-pending">
+        <div class="card">
+          <h2 class="section-title">Pending Invoices</h2>
+          <div class="blink-notice" id="pending-notice"></div>
+          <div class="dept-row" id="pending-dept-row">
+            <button data-dept="HARDLINE">Hardline</button>
+            <button data-dept="SOFTLINE">Softline</button>
+            <button data-dept="EG">EG</button>
+            <button data-dept="CONSIGNMENT">Consignment</button>
+          </div>
+          <input type="text" id="pending-search" class="uc" placeholder="SEARCH INV / ODO NO...">
+          <ul class="record-list" id="pending-list"></ul>
+          <div class="empty-note" id="pending-empty" style="display:none;">Select a department above to view pending invoices.</div>
+        </div>
+      </div>
+
+      <div id="sub-completed" style="display:none;">
+        <div class="card">
+          <h2 class="section-title">Completed Invoices</h2>
+          <div class="dept-row" id="completed-dept-row">
+            <button data-dept="HARDLINE">Hardline</button>
+            <button data-dept="SOFTLINE">Softline</button>
+            <button data-dept="EG">EG</button>
+            <button data-dept="CONSIGNMENT">Consignment</button>
+          </div>
+          <div class="bucket-row">
+            <button data-bucket="10" class="active">Last 10 days</button>
+            <button data-bucket="30">Last 30 days</button>
+            <button data-bucket="60">60 days+</button>
+          </div>
+          <ul class="record-list" id="completed-list"></ul>
+          <div class="empty-note" id="completed-empty" style="display:none;">Select a department above to view completed invoices.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INVOICE SUMMARY -->
+    <section id="panel-summary" class="panel">
+      <div class="card no-print">
+        <h2 class="section-title">Invoice Summary</h2>
+        <div class="report-controls">
+          <div>
+            <label>From Date</label>
+            <input type="date" id="summary-start">
+          </div>
+          <div>
+            <label>To Date</label>
+            <input type="date" id="summary-end">
+          </div>
+        </div>
+        <div class="dept-row" id="summary-dept-row" style="margin-top:14px;">
+          <button data-dept="HARDLINE">Hardline</button>
+          <button data-dept="SOFTLINE">Softline</button>
+        </div>
+        <div>
+          <label>Sub-Department</label>
+          <select id="summary-sub-dept" disabled style="max-width:280px;"></select>
+        </div>
+        <div class="actions-row">
+          <button class="btn btn-primary" id="btn-generate-summary">Generate Summary</button>
+        </div>
+        <div class="msg" id="summary-msg"></div>
+      </div>
+
+      <div class="card printable-area" id="summary-print-area" style="display:none;">
+        <div class="report-heading">
+          <h3>SHBN Invoice Summary</h3>
+          <div class="report-range-label" id="summary-range-label"></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Supplier</th><th>Main Dept</th><th>Sub Dept</th>
+              <th>Inv/ODO No</th><th>PO No</th><th>Carton</th><th>Amount</th>
+              <th>Record By</th><th>Key In By</th><th>Date Key In</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="summary-tbody"></tbody>
+        </table>
+        <div class="grand-total">Grand Total Amount: <span id="summary-grand-total">-</span></div>
+        <div class="actions-row no-print" style="margin-top:16px;">
+          <button class="btn btn-ghost" id="btn-print-summary">Print Summary</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="panel-admin" class="panel">
+      <div id="admin-lock" class="card lock-screen">
+        <h2 class="section-title" style="justify-content:center;">Admin Access</h2>
+        <p style="color:var(--muted);font-size:0.85rem;">Enter admin password to continue.</p>
+        <input type="password" id="admin-pass" maxlength="4">
+        <div class="actions-row" style="justify-content:center;">
+          <button class="btn btn-primary" id="btn-admin-login">Unlock</button>
+        </div>
+        <div class="msg error" id="admin-msg"></div>
+      </div>
+
+      <div id="admin-panel" style="display:none;">
+        <div class="card">
+          <h2 class="section-title">Admin &middot; Pending Records</h2>
+          <div class="dept-row" id="admin-pending-dept-row">
+            <button data-dept="HARDLINE">Hardline</button>
+            <button data-dept="SOFTLINE">Softline</button>
+            <button data-dept="EG">EG</button>
+            <button data-dept="CONSIGNMENT">Consignment</button>
+          </div>
+          <input type="text" id="admin-pending-search" class="uc" placeholder="SEARCH INV / ODO NO...">
+          <div class="list-toggle-row">
+            <button class="btn btn-ghost btn-small" id="btn-toggle-admin-pending">Hide List</button>
+          </div>
+          <div id="admin-pending-list-wrap">
+            <div id="admin-pending-list"></div>
+            <div class="empty-note" id="admin-pending-empty" style="display:none;">Select a department above, or search by Inv / ODO No.</div>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="section-title">Admin &middot; Completed Records</h2>
+          <div class="dept-row" id="admin-completed-dept-row">
+            <button data-dept="HARDLINE">Hardline</button>
+            <button data-dept="SOFTLINE">Softline</button>
+            <button data-dept="EG">EG</button>
+            <button data-dept="CONSIGNMENT">Consignment</button>
+          </div>
+          <input type="text" id="admin-completed-search" class="uc" placeholder="SEARCH INV / ODO NO...">
+          <div class="bucket-row">
+            <button data-abucket="10" class="active">Last 10 days</button>
+            <button data-abucket="30">Last 30 days</button>
+            <button data-abucket="60">60 days+</button>
+          </div>
+          <div class="list-toggle-row">
+            <button class="btn btn-ghost btn-small" id="btn-toggle-admin-completed">Hide List</button>
+          </div>
+          <div id="admin-completed-list-wrap">
+            <div id="admin-completed-list"></div>
+            <div class="empty-note" id="admin-completed-empty" style="display:none;">Select a department above, or search by Inv / ODO No.</div>
+          </div>
+        </div>
+
+        <div class="card no-print">
+          <h2 class="section-title">Printable Report</h2>
+          <div class="report-controls">
+            <div>
+              <label>From Date</label>
+              <input type="date" id="report-start">
+            </div>
+            <div>
+              <label>To Date</label>
+              <input type="date" id="report-end">
+            </div>
+            <div>
+              <button class="btn btn-primary" id="btn-generate-report">Generate Report</button>
+            </div>
+          </div>
+          <div class="msg" id="report-msg"></div>
+        </div>
+
+        <div class="card printable-area" id="report-print-area" style="display:none;">
+          <div class="report-heading">
+            <h3>SHBN Departmental Invoice Report</h3>
+            <div class="report-range-label" id="report-range-label"></div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th><th>Supplier</th><th>Main Dept</th><th>Sub Dept</th>
+                <th>Inv/ODO No</th><th>PO No</th><th>Carton</th><th>Amount</th>
+                <th>Record By</th><th>Key In By</th><th>Date Key In</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="report-tbody"></tbody>
+          </table>
+          <div class="actions-row no-print" style="margin-top:16px;">
+            <button class="btn btn-ghost" id="btn-print-report">Print Report</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- DETAIL / EDIT MODAL (used by Pending Invoice tab) -->
+<div class="modal-backdrop" id="detail-backdrop">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Invoice Detail</h3>
+      <div>
+        <button class="icon-btn" id="btn-edit-toggle" title="Edit">&#9998;</button>
+        <button class="close-x" id="btn-close-detail">&times;</button>
+      </div>
+    </div>
+    <div class="field-grid">
+      <div><label>Date</label><input type="text" id="d-date" readonly></div>
+      <div><label>Supplier</label><input type="text" id="d-supplier" class="uc" readonly></div>
+      <div><label>Main Department</label>
+        <select id="d-main-dept" disabled>
+          <option value="">-- SELECT --</option>
+          <option value="HARDLINE">HARDLINE</option>
+          <option value="SOFTLINE">SOFTLINE</option>
+          <option value="EG">EG</option>
+          <option value="CONSIGNMENT">CONSIGNMENT</option>
+        </select>
+      </div>
+      <div><label>Sub-Department / Brand</label>
+        <select id="d-sub-dept-select" disabled></select>
+        <input type="text" id="d-sub-dept-input" class="uc brand-input" readonly>
+      </div>
+      <div><label>Inv / ODO No</label><input type="text" id="d-inv" class="uc" readonly></div>
+      <div><label>PO No</label><input type="text" id="d-po" class="uc" readonly></div>
+      <div><label>Date of Received</label><input type="date" id="d-date-received" readonly></div>
+      <div><label>Total Carton</label><input type="number" step="any" id="d-carton" readonly></div>
+      <div><label>Total Amount</label><input type="text" id="d-amount" readonly></div>
+      <div><label>Record By</label><input type="text" id="d-recordby" class="uc" readonly></div>
+      <div><label>Key In By <span class="req">*</span></label><input type="text" id="d-keyinby" class="uc"></div>
+    </div>
+    <div class="actions-row">
+      <button class="btn btn-ghost" id="btn-save-changes" style="display:none;">Save Changes</button>
+      <button class="btn btn-primary" id="btn-complete">Submit &amp; Complete</button>
+    </div>
+    <div class="msg" id="detail-msg"></div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL (admin) -->
+<div class="modal-backdrop" id="confirm-backdrop">
+  <div class="modal confirm-box">
+    <div class="modal-header" style="justify-content:center;">
+      <h3>Confirm Deletion</h3>
+    </div>
+    <p style="font-size:0.85rem;color:var(--muted);">This will permanently delete invoice <strong id="confirm-inv-no"></strong>. Type <strong>CONFIRM</strong> below to proceed.</p>
+    <input type="text" id="confirm-input">
+    <div class="actions-row" style="justify-content:center;">
+      <button class="btn btn-ghost" id="btn-cancel-delete">Cancel</button>
+      <button class="btn btn-danger" id="btn-do-delete">Delete Permanently</button>
+    </div>
+    <div class="msg error" id="confirm-msg"></div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   BACKEND API CONFIG — Vercel function talking to Neon Postgres
+   (replaces the old Google Apps Script + Sheets backend)
+   ========================================================= */
+const API_URL = "https://shbn-departmental-invoice-record-v2.vercel.app/api/invoices";
+const ADMIN_PASSWORD = "8888";
+
+// Calls our own backend. Unlike the old Apps Script setup, our Vercel
+// function handles CORS preflight properly, so this can use a normal
+// application/json content-type instead of the old text/plain workaround.
+//
+// Right after a fresh deploy, hosting infrastructure can occasionally
+// take a moment to fully come online — that failure is transient, not
+// a real error, so this retries a couple of times with a short pause
+// before actually surfacing anything to the user.
+async function callApi(action, payload = {}, retries = 2){
+  for(let attempt = 0; attempt <= retries; attempt++){
+    try{
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, ...payload })
+      });
+      return await res.json();
+    } catch(err){
+      if(attempt === retries) throw err;
+      await new Promise(resolve => setTimeout(resolve, 800 * (attempt + 1)));
+    }
+  }
+}
+
+/* =========================================================
+   Helpers
+   ========================================================= */
+const SUB_DEPT_OPTIONS = [
+  "BATTERY","HOUSEHOLD","ELECTRICAL","HARDWARE","CAR ACCESSORIES","STATIONERY",
+  "SPORTS","TOYS","GIFT","FESTIVAL","LINEN FURNISHING","LUGGAGE","SLIPPERS",
+  "BACK TO SCHOOL","LADIES","GENTS","GENTS' FOOTWEAR","BABY / INFANT",
+  "BABY ACCESSORIES","CHILDREN"
+];
+
+// Used only by the Invoice Summary tab's Sub-Department filter, which
+// narrows the list based on the chosen Main Department.
+const HARDLINE_SUB_DEPTS = [
+  "BATTERY","HOUSEHOLD","ELECTRICAL","HARDWARE","CAR ACCESSORIES",
+  "STATIONERY","SPORTS","TOYS","GIFT","FESTIVAL","LINEN FURNISHING","LUGGAGE"
+];
+const SOFTLINE_SUB_DEPTS = [
+  "SLIPPERS","BACK TO SCHOOL","LADIES","GENTS","GENTS' FOOTWEAR",
+  "BABY / INFANT","BABY ACCESSORIES","CHILDREN"
+];
+
+function populateSubDeptSelect(selectEl, options, allLabel){
+  const list = options || SUB_DEPT_OPTIONS;
+  selectEl.innerHTML = "";
+  const blank = document.createElement("option");
+  blank.value = ""; blank.textContent = "-- SELECT --";
+  selectEl.appendChild(blank);
+  if(allLabel){
+    const allOpt = document.createElement("option");
+    allOpt.value = "ALL"; allOpt.textContent = allLabel;
+    selectEl.appendChild(allOpt);
+  }
+  list.forEach(opt => {
+    const o = document.createElement("option");
+    o.value = opt; o.textContent = opt;
+    selectEl.appendChild(o);
+  });
+}
+populateSubDeptSelect(document.getElementById("f-sub-dept-select"));
+populateSubDeptSelect(document.getElementById("d-sub-dept-select"));
+populateSubDeptSelect(document.getElementById("summary-sub-dept"));
+
+function daysAgo(iso){
+  if(!iso) return Infinity;
+  const diff = Date.now() - new Date(iso).getTime();
+  return diff / (1000*60*60*24);
+}
+function bucketMatch(iso, bucket){
+  const d = daysAgo(iso);
+  if(bucket === "10") return d <= 10;
+  if(bucket === "30") return d > 10 && d <= 30;
+  if(bucket === "60") return d > 30 && d <= 90;
+  return false;
+}
+function within90(iso){ return daysAgo(iso) <= 90; }
+function escapeHtml(s){
+  return (s ?? "").toString().replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+// Formats a number as "4,115.00" / "15,000.00". Returns "-" for blank/invalid.
+function formatMoney(v){
+  if(v === "" || v === null || v === undefined || isNaN(Number(v))) return "-";
+  return Number(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+// Converts a stored "dd.MM.yyyy" string (Date of Received) into the
+// "yyyy-mm-dd" format an <input type="date"> needs for its value.
+function ddmmyyyyToIso(str){
+  if(!str) return "";
+  const m = String(str).match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+  if(!m) return "";
+  return `${m[3]}-${m[2]}-${m[1]}`;
+}
+
+// Main Department must be selected before Sub-Department becomes editable
+// (New Entry form). Consignment swaps the fixed dropdown for a free-text
+// brand field, since consignment brands aren't part of the fixed list.
+document.getElementById("f-main-dept").addEventListener("change", (e) => {
+  const sel = document.getElementById("f-sub-dept-select");
+  const inp = document.getElementById("f-sub-dept-input");
+  if(e.target.value === "CONSIGNMENT"){
+    sel.style.display = "none"; sel.disabled = true; sel.value = "";
+    inp.classList.remove("brand-input"); inp.value = "";
+  } else if(e.target.value){
+    sel.style.display = ""; sel.disabled = false;
+    inp.classList.add("brand-input"); inp.value = "";
+  } else {
+    sel.style.display = ""; sel.disabled = true; sel.value = "";
+    inp.classList.add("brand-input"); inp.value = "";
+  }
+});
+function getNewEntrySubDept(){
+  const mainDept = document.getElementById("f-main-dept").value;
+  if(mainDept === "CONSIGNMENT") return document.getElementById("f-sub-dept-input").value.trim();
+  return document.getElementById("f-sub-dept-select").value;
+}
+
+// force-uppercase on any input carrying the .uc class
+document.addEventListener("input", (e) => {
+  if(e.target.classList && e.target.classList.contains("uc")){
+    const pos = e.target.selectionStart;
+    e.target.value = e.target.value.toUpperCase();
+    e.target.setSelectionRange(pos, pos);
+  }
+});
+
+/* =========================================================
+   Tab navigation
+   ========================================================= */
+document.querySelectorAll("nav.tabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
+    if(btn.dataset.tab === "pending"){ loadPending(); }
+  });
+});
+
+document.querySelectorAll(".subtabs button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".subtabs button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    if(btn.dataset.sub === "pending"){
+      document.getElementById("sub-pending").style.display = "";
+      document.getElementById("sub-completed").style.display = "none";
+      loadPending();
+    } else {
+      document.getElementById("sub-pending").style.display = "none";
+      document.getElementById("sub-completed").style.display = "";
+      loadCompleted();
+    }
+  });
+});
+
+let currentBucket = "10";
+document.querySelectorAll(".bucket-row button[data-bucket]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".bucket-row button[data-bucket]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentBucket = btn.dataset.bucket;
+    renderCompletedList();
+  });
+});
+
+let currentAdminBucket = "10";
+document.querySelectorAll(".bucket-row button[data-abucket]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".bucket-row button[data-abucket]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentAdminBucket = btn.dataset.abucket;
+    renderAdminCompletedList();
+  });
+});
+
+/* =========================================================
+   NEW ENTRY
+   ========================================================= */
+document.getElementById("btn-submit-new").addEventListener("click", async () => {
+  const supplier = document.getElementById("f-supplier").value.trim();
+  const mainDept = document.getElementById("f-main-dept").value;
+  const subDept = getNewEntrySubDept();
+  const inv = document.getElementById("f-inv").value.trim();
+  const po = document.getElementById("f-po").value.trim();
+  const dateReceived = document.getElementById("f-date-received").value;
+  const carton = document.getElementById("f-carton").value;
+  const amount = document.getElementById("f-amount").value;
+  const recordby = document.getElementById("f-recordby").value.trim();
+  const msg = document.getElementById("new-msg");
+
+  if(!supplier || !mainDept || !subDept || !inv || !po || !dateReceived || !recordby){
+    msg.className = "msg error";
+    msg.textContent = "Please fill in all required fields (Supplier, Main Department, Sub-Department/Brand, Inv/ODO No, PO No, Date of Received, Record By).";
+    return;
+  }
+
+  const payload = {
+    supplier,
+    main_department: mainDept,
+    sub_department: subDept,
+    inv_odo_no: inv,
+    po_no: po,
+    date_received: dateReceived,
+    total_carton: carton === "" ? null : Number(carton),
+    total_amount: amount === "" ? null : Number(amount),
+    record_by: recordby
+  };
+
+  msg.className = "msg";
+  msg.textContent = "Submitting...";
+
+  let resp;
+  try{
+    resp = await callApi("newEntry", payload);
+  } catch(err){
+    msg.className = "msg error";
+    msg.textContent = "Error: " + err.message;
+    return;
+  }
+  if(!resp.success){
+    msg.className = "msg error";
+    msg.textContent = "Error: " + (resp.error || "Could not submit entry.");
+    return;
+  }
+  msg.className = "msg ok";
+  msg.textContent = "Entry submitted successfully.";
+  ["f-supplier","f-inv","f-po","f-date-received","f-carton","f-amount","f-recordby"].forEach(id=>{
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("f-main-dept").value = "";
+  document.getElementById("f-sub-dept-select").value = "";
+  document.getElementById("f-sub-dept-select").disabled = true;
+  document.getElementById("f-sub-dept-select").style.display = "";
+  document.getElementById("f-sub-dept-input").value = "";
+  document.getElementById("f-sub-dept-input").style.display = "none";
+  document.getElementById("f-sub-dept-input").classList.add("brand-input");
+});
+
+/* =========================================================
+   PENDING LIST
+   ========================================================= */
+let currentPendingDept = null;
+let pendingSearchTerm = "";
+let allPendingRows = [];
+
+document.querySelectorAll("#pending-dept-row button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#pending-dept-row button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentPendingDept = btn.dataset.dept;
+    renderPendingList();
+  });
+});
+
+document.getElementById("pending-search").addEventListener("input", (e) => {
+  pendingSearchTerm = e.target.value.trim();
+  renderPendingList();
+});
+
+async function loadPending(){
+  const empty = document.getElementById("pending-empty");
+  let resp;
+  try{
+    resp = await callApi("listPending");
+  } catch(err){
+    empty.style.display="block"; empty.textContent = "Error loading: "+err.message; return;
+  }
+  if(!resp.success){ empty.style.display="block"; empty.textContent = "Error loading: "+(resp.error||""); return; }
+
+  allPendingRows = resp.data || [];
+  renderPendingNotice();
+  renderPendingList();
+}
+
+function renderPendingNotice(){
+  const notice = document.getElementById("pending-notice");
+  const depts = ["HARDLINE","SOFTLINE","EG","CONSIGNMENT"];
+  const label = d => d === "EG" ? "EG" : (d.charAt(0) + d.slice(1).toLowerCase());
+  const parts = depts
+    .map(d => ({ d, count: allPendingRows.filter(r => r.main_department === d).length }))
+    .filter(x => x.count > 0)
+    .map(x => `! ${x.count} ${label(x.d)} Inv(s) pending.`);
+
+  if(parts.length === 0){
+    notice.classList.remove("show");
+    notice.textContent = "";
+  } else {
+    notice.classList.add("show");
+    notice.textContent = parts.join("  ");
+  }
+}
+
+function renderPendingList(){
+  const list = document.getElementById("pending-list");
+  const empty = document.getElementById("pending-empty");
+  list.innerHTML = "";
+
+  if(!currentPendingDept && !pendingSearchTerm){
+    empty.style.display = "block";
+    empty.textContent = "Select a department above, or search by Inv / ODO No.";
+    list.style.display = "none";
+    return;
+  }
+
+  let filtered = allPendingRows;
+  if(currentPendingDept){
+    filtered = filtered.filter(r => r.main_department === currentPendingDept);
+  }
+  if(pendingSearchTerm){
+    const term = pendingSearchTerm.toUpperCase();
+    filtered = filtered.filter(r => String(r.inv_odo_no ?? "").toUpperCase().includes(term));
+  }
+
+  if(filtered.length === 0){
+    empty.style.display = "block";
+    empty.textContent = "No pending invoices match your search.";
+    list.style.display = "none";
+    return;
+  }
+  empty.style.display = "none";
+  list.style.display = "";
+
+  filtered.forEach(row => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div>
+        <div class="inv-no">${escapeHtml(row.inv_odo_no)}</div>
+        <div class="meta">${escapeHtml(row.supplier)} &middot; ${escapeHtml(row.sub_department)} &middot; ${escapeHtml(row.date)}</div>
+      </div>
+      <span class="stamp pending">PENDING</span>
+    `;
+    li.addEventListener("click", () => openDetail(row));
+    list.appendChild(li);
+  });
+}
+
+/* =========================================================
+   COMPLETED LIST
+   ========================================================= */
+let currentCompletedDept = null;
+let allCompletedRows = [];
+
+document.querySelectorAll("#completed-dept-row button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#completed-dept-row button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentCompletedDept = btn.dataset.dept;
+    renderCompletedList();
+  });
+});
+
+async function loadCompleted(){
+  const empty = document.getElementById("completed-empty");
+  let resp;
+  try{
+    resp = await callApi("listCompleted", { monthsBack: 4 });
+  } catch(err){
+    empty.style.display="block"; empty.textContent = "Error loading: "+err.message; return;
+  }
+  if(!resp.success){ empty.style.display="block"; empty.textContent = "Error loading: "+(resp.error||""); return; }
+
+  allCompletedRows = resp.data || [];
+  renderCompletedList();
+}
+
+function renderCompletedList(){
+  const list = document.getElementById("completed-list");
+  const empty = document.getElementById("completed-empty");
+  list.innerHTML = "";
+
+  if(!currentCompletedDept){
+    empty.style.display = "block";
+    empty.textContent = "Select a department above to view completed invoices.";
+    list.style.display = "none";
+    return;
+  }
+
+  const filtered = allCompletedRows.filter(r =>
+    r.main_department === currentCompletedDept &&
+    within90(r.completed_at) &&
+    bucketMatch(r.completed_at, currentBucket)
+  );
+
+  if(filtered.length === 0){
+    empty.style.display = "block";
+    empty.textContent = "No completed invoices in this range.";
+    list.style.display = "none";
+    return;
+  }
+  empty.style.display = "none";
+  list.style.display = "";
+
+  filtered.forEach(row => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <div>
+        <div class="inv-no">${escapeHtml(row.inv_odo_no)}</div>
+        <div class="meta">${escapeHtml(row.supplier)} &middot; ${escapeHtml(row.sub_department)} &middot; Completed ${escapeHtml(row.date_key_in)}</div>
+      </div>
+      <span class="stamp completed">COMPLETED</span>
+    `;
+    li.addEventListener("click", () => openDetail(row));
+    list.appendChild(li);
+  });
+}
+
+/* =========================================================
+   DETAIL / EDIT MODAL
+   ========================================================= */
+let activeRow = null;
+let editMode = false;
+
+function setDetailSubDeptField(mainDept, subDeptValue){
+  const sel = document.getElementById("d-sub-dept-select");
+  const inp = document.getElementById("d-sub-dept-input");
+  if(mainDept === "CONSIGNMENT"){
+    sel.style.display = "none";
+    inp.classList.remove("brand-input");
+    inp.value = subDeptValue || "";
+  } else {
+    sel.style.display = "";
+    inp.classList.add("brand-input");
+    sel.value = subDeptValue || "";
+  }
+}
+
+function openDetail(row){
+  activeRow = row;
+  editMode = false;
+  document.getElementById("d-date").value = row.date || "";
+  document.getElementById("d-supplier").value = row.supplier || "";
+  document.getElementById("d-main-dept").value = row.main_department || "";
+  setDetailSubDeptField(row.main_department, row.sub_department);
+  document.getElementById("d-inv").value = row.inv_odo_no || "";
+  document.getElementById("d-po").value = row.po_no || "";
+  document.getElementById("d-date-received").value = ddmmyyyyToIso(row.date_received);
+  document.getElementById("d-carton").value = row.total_carton ?? "";
+  const amountEl = document.getElementById("d-amount");
+  amountEl.dataset.raw = row.total_amount ?? "";
+  amountEl.type = "text";
+  amountEl.value = formatMoney(row.total_amount);
+  document.getElementById("d-recordby").value = row.record_by || "";
+  document.getElementById("d-keyinby").value = row.key_in_by || "";
+  document.getElementById("detail-msg").textContent = "";
+
+  const editableTextIds = ["d-supplier","d-inv","d-po","d-carton","d-recordby"];
+  editableTextIds.forEach(id => document.getElementById(id).readOnly = true);
+  document.getElementById("d-main-dept").disabled = true;
+  document.getElementById("d-sub-dept-select").disabled = true;
+  document.getElementById("d-sub-dept-input").readOnly = true;
+  document.getElementById("d-date-received").readOnly = true;
+
+  const isCompletedView = row.status === "COMPLETED";
+  document.getElementById("btn-complete").style.display = isCompletedView ? "none" : "";
+  document.getElementById("btn-save-changes").style.display = "none";
+  document.getElementById("btn-edit-toggle").style.display = isCompletedView ? "none" : "";
+
+  document.getElementById("detail-backdrop").classList.add("active");
+}
+
+document.getElementById("btn-close-detail").addEventListener("click", () => {
+  document.getElementById("detail-backdrop").classList.remove("active");
+  activeRow = null;
+});
+
+// If the Main Department is changed while editing, swap the sub-department
+// control to match (dropdown for the fixed 3, free-text for Consignment).
+document.getElementById("d-main-dept").addEventListener("change", (e) => {
+  if(!editMode) return;
+  setDetailSubDeptField(e.target.value, "");
+  document.getElementById("d-sub-dept-select").disabled = (e.target.value === "CONSIGNMENT");
+  document.getElementById("d-sub-dept-input").readOnly = (e.target.value !== "CONSIGNMENT");
+});
+
+// Re-populates every editable field from the original row data — used
+// when the user cancels an in-progress edit (toggles the pencil back
+// off without clicking "Save Changes"), so no half-typed changes are
+// left visibly showing as if they'd been saved.
+function revertDetailFieldsFromActiveRow(){
+  if(!activeRow) return;
+  document.getElementById("d-supplier").value = activeRow.supplier || "";
+  document.getElementById("d-main-dept").value = activeRow.main_department || "";
+  setDetailSubDeptField(activeRow.main_department, activeRow.sub_department);
+  document.getElementById("d-inv").value = activeRow.inv_odo_no || "";
+  document.getElementById("d-po").value = activeRow.po_no || "";
+  document.getElementById("d-date-received").value = ddmmyyyyToIso(activeRow.date_received);
+  document.getElementById("d-carton").value = activeRow.total_carton ?? "";
+  document.getElementById("d-amount").dataset.raw = activeRow.total_amount ?? "";
+  document.getElementById("d-recordby").value = activeRow.record_by || "";
+}
+
+document.getElementById("btn-edit-toggle").addEventListener("click", () => {
+  editMode = !editMode;
+
+  if(!editMode){
+    revertDetailFieldsFromActiveRow();
+  }
+
+  const editableTextIds = ["d-supplier","d-inv","d-po","d-carton","d-recordby"];
+  editableTextIds.forEach(id => document.getElementById(id).readOnly = !editMode);
+  document.getElementById("d-main-dept").disabled = !editMode;
+  document.getElementById("d-date-received").readOnly = !editMode;
+
+  const mainDeptVal = document.getElementById("d-main-dept").value;
+  document.getElementById("d-sub-dept-select").disabled = !editMode || (mainDeptVal === "CONSIGNMENT");
+  document.getElementById("d-sub-dept-input").readOnly = !editMode || (mainDeptVal !== "CONSIGNMENT");
+
+  const amountEl = document.getElementById("d-amount");
+  if(editMode){
+    amountEl.type = "number";
+    amountEl.step = "any";
+    amountEl.value = amountEl.dataset.raw || "";
+  } else {
+    amountEl.type = "text";
+    amountEl.value = formatMoney(amountEl.dataset.raw);
+  }
+
+  document.getElementById("btn-save-changes").style.display = editMode ? "" : "none";
+});
+
+// Converts an <input type="date"> value ("yyyy-mm-dd") back into the
+// "dd.MM.yyyy" display format the backend stores, so activeRow can be
+// kept in sync with what was just saved without re-fetching.
+function isoToDdMmYyyy(iso){
+  if(!iso) return "";
+  const [y,m,d] = iso.split("-");
+  return `${d}.${m}.${y}`;
+}
+
+document.getElementById("btn-save-changes").addEventListener("click", async () => {
+  if(!activeRow) return;
+  const msg = document.getElementById("detail-msg");
+  const supplier = document.getElementById("d-supplier").value.trim();
+  const mainDept = document.getElementById("d-main-dept").value;
+  const subDept = mainDept === "CONSIGNMENT"
+    ? document.getElementById("d-sub-dept-input").value.trim()
+    : document.getElementById("d-sub-dept-select").value;
+  const inv = document.getElementById("d-inv").value.trim();
+  const po = document.getElementById("d-po").value.trim();
+  const dateReceived = document.getElementById("d-date-received").value;
+  const recordby = document.getElementById("d-recordby").value.trim();
+
+  if(!supplier || !mainDept || !subDept || !inv || !po || !dateReceived || !recordby){
+    msg.className = "msg error";
+    msg.textContent = "Supplier, Main Department, Sub-Department/Brand, Inv/ODO No, PO No, Date of Received and Record By cannot be empty.";
+    return;
+  }
+
+  const carton = document.getElementById("d-carton").value;
+  const amountEl = document.getElementById("d-amount");
+  const amount = amountEl.value;
+
+  msg.className = "msg";
+  msg.textContent = "Saving...";
+
+  let resp;
+  try{
+    resp = await callApi("updateEntry", {
+      id: activeRow.id,
+      supplier,
+      main_department: mainDept,
+      sub_department: subDept,
+      inv_odo_no: inv,
+      po_no: po,
+      date_received: dateReceived,
+      total_carton: carton === "" ? null : Number(carton),
+      total_amount: amount === "" ? null : Number(amount),
+      record_by: recordby
+    });
+  } catch(err){
+    msg.className = "msg error"; msg.textContent = "Error: "+err.message; return;
+  }
+  if(!resp.success){ msg.className="msg error"; msg.textContent = "Error: "+(resp.error||""); return; }
+
+  msg.className = "msg ok";
+  msg.textContent = "Changes saved.";
+  editMode = false;
+  activeRow.supplier = supplier;
+  activeRow.main_department = mainDept;
+  activeRow.sub_department = subDept;
+  activeRow.inv_odo_no = inv;
+  activeRow.po_no = po;
+  activeRow.date_received = isoToDdMmYyyy(dateReceived);
+  activeRow.total_carton = carton === "" ? "" : Number(carton);
+  activeRow.total_amount = amount === "" ? "" : Number(amount);
+  activeRow.record_by = recordby;
+  const editableTextIds = ["d-supplier","d-inv","d-po","d-carton","d-recordby"];
+  editableTextIds.forEach(id => document.getElementById(id).readOnly = true);
+  document.getElementById("d-main-dept").disabled = true;
+  document.getElementById("d-date-received").readOnly = true;
+  document.getElementById("d-sub-dept-select").disabled = true;
+  document.getElementById("d-sub-dept-input").readOnly = true;
+  amountEl.dataset.raw = amount === "" ? "" : Number(amount);
+  amountEl.type = "text";
+  amountEl.value = formatMoney(amountEl.dataset.raw);
+  document.getElementById("btn-save-changes").style.display = "none";
+  loadPending();
+});
+
+document.getElementById("btn-complete").addEventListener("click", async () => {
+  if(!activeRow) return;
+  const msg = document.getElementById("detail-msg");
+  const keyinby = document.getElementById("d-keyinby").value.trim();
+  if(!keyinby){
+    msg.className = "msg error";
+    msg.textContent = "Key In By is required to complete this record.";
+    return;
+  }
+  msg.className = "msg";
+  msg.textContent = "Submitting...";
+
+  let resp;
+  try{
+    resp = await callApi("completeEntry", {
+      id: activeRow.id,
+      key_in_by: keyinby
+    });
+  } catch(err){
+    msg.className = "msg error"; msg.textContent = "Error: "+err.message; return;
+  }
+  if(!resp.success){ msg.className="msg error"; msg.textContent = "Error: "+(resp.error||""); return; }
+
+  document.getElementById("detail-backdrop").classList.remove("active");
+  activeRow = null;
+  loadPending();
+});
+
+/* =========================================================
+   ADMIN
+   ========================================================= */
+document.getElementById("btn-admin-login").addEventListener("click", () => {
+  const val = document.getElementById("admin-pass").value.trim();
+  const msg = document.getElementById("admin-msg");
+  if(val === ADMIN_PASSWORD){
+    document.getElementById("admin-lock").style.display = "none";
+    document.getElementById("admin-panel").style.display = "";
+    loadAdminPending();
+    loadAdminCompleted();
+  } else {
+    msg.textContent = "Incorrect password.";
+  }
+});
+
+let currentAdminPendingDept = null;
+let adminPendingSearchTerm = "";
+let allAdminPendingRows = [];
+
+let currentAdminCompletedDept = null;
+let adminCompletedSearchTerm = "";
+let allAdminCompletedRows = [];
+
+document.querySelectorAll("#admin-pending-dept-row button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#admin-pending-dept-row button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentAdminPendingDept = btn.dataset.dept;
+    renderAdminPendingList();
+  });
+});
+document.getElementById("admin-pending-search").addEventListener("input", (e) => {
+  adminPendingSearchTerm = e.target.value.trim();
+  renderAdminPendingList();
+});
+
+document.querySelectorAll("#admin-completed-dept-row button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#admin-completed-dept-row button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentAdminCompletedDept = btn.dataset.dept;
+    renderAdminCompletedList();
+  });
+});
+document.getElementById("admin-completed-search").addEventListener("input", (e) => {
+  adminCompletedSearchTerm = e.target.value.trim();
+  renderAdminCompletedList();
+});
+
+document.getElementById("btn-toggle-admin-pending").addEventListener("click", (e) => {
+  const wrap = document.getElementById("admin-pending-list-wrap");
+  const hidden = wrap.style.display === "none";
+  wrap.style.display = hidden ? "" : "none";
+  e.target.textContent = hidden ? "Hide List" : "Show List";
+});
+document.getElementById("btn-toggle-admin-completed").addEventListener("click", (e) => {
+  const wrap = document.getElementById("admin-completed-list-wrap");
+  const hidden = wrap.style.display === "none";
+  wrap.style.display = hidden ? "" : "none";
+  e.target.textContent = hidden ? "Hide List" : "Show List";
+});
+
+async function loadAdminPending(){
+  const empty = document.getElementById("admin-pending-empty");
+  let resp;
+  try{
+    resp = await callApi("listPending");
+  } catch(err){ empty.style.display="block"; empty.textContent = "Error: "+err.message; return; }
+  if(!resp.success){ empty.style.display="block"; empty.textContent = "Error: "+(resp.error||""); return; }
+  allAdminPendingRows = resp.data || [];
+  renderAdminPendingList();
+}
+
+function renderAdminPendingList(){
+  const box = document.getElementById("admin-pending-list");
+  const empty = document.getElementById("admin-pending-empty");
+  box.innerHTML = "";
+
+  if(!currentAdminPendingDept && !adminPendingSearchTerm){
+    empty.style.display = "block";
+    empty.textContent = "Select a department above, or search by Inv / ODO No.";
+    return;
+  }
+
+  let filtered = allAdminPendingRows;
+  if(currentAdminPendingDept){
+    filtered = filtered.filter(r => r.main_department === currentAdminPendingDept);
+  }
+  if(adminPendingSearchTerm){
+    const term = adminPendingSearchTerm.toUpperCase();
+    filtered = filtered.filter(r => String(r.inv_odo_no ?? "").toUpperCase().includes(term));
+  }
+
+  if(filtered.length === 0){
+    empty.style.display = "block";
+    empty.textContent = "No pending invoices match your filters.";
+    return;
+  }
+  empty.style.display = "none";
+  filtered.forEach(row => box.appendChild(renderAdminRow(row)));
+}
+
+async function loadAdminCompleted(){
+  const empty = document.getElementById("admin-completed-empty");
+  let resp;
+  try{
+    resp = await callApi("listCompleted", { monthsBack: 4 });
+  } catch(err){ empty.style.display="block"; empty.textContent = "Error: "+err.message; return; }
+  if(!resp.success){ empty.style.display="block"; empty.textContent = "Error: "+(resp.error||""); return; }
+  allAdminCompletedRows = resp.data || [];
+  renderAdminCompletedList();
+}
+
+function renderAdminCompletedList(){
+  const box = document.getElementById("admin-completed-list");
+  const empty = document.getElementById("admin-completed-empty");
+  box.innerHTML = "";
+
+  if(!currentAdminCompletedDept && !adminCompletedSearchTerm){
+    empty.style.display = "block";
+    empty.textContent = "Select a department above, or search by Inv / ODO No.";
+    return;
+  }
+
+  let filtered = allAdminCompletedRows.filter(r => within90(r.completed_at) && bucketMatch(r.completed_at, currentAdminBucket));
+  if(currentAdminCompletedDept){
+    filtered = filtered.filter(r => r.main_department === currentAdminCompletedDept);
+  }
+  if(adminCompletedSearchTerm){
+    const term = adminCompletedSearchTerm.toUpperCase();
+    filtered = filtered.filter(r => String(r.inv_odo_no ?? "").toUpperCase().includes(term));
+  }
+
+  if(filtered.length === 0){
+    empty.style.display = "block";
+    empty.textContent = "No completed invoices match your filters.";
+    return;
+  }
+  empty.style.display = "none";
+  filtered.forEach(row => box.appendChild(renderAdminRow(row)));
+}
+
+function renderAdminRow(row){
+  const div = document.createElement("div");
+  div.className = "admin-row";
+  div.innerHTML = `
+    <div class="info">
+      <div class="inv-no">${escapeHtml(row.inv_odo_no)}</div>
+      <div>${escapeHtml(row.supplier)} &middot; ${escapeHtml(row.main_department)} / ${escapeHtml(row.sub_department)} &middot; ${escapeHtml(row.date)}</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span class="stamp ${row.status === 'COMPLETED' ? 'completed' : 'pending'}">${escapeHtml(row.status)}</span>
+      <button class="btn btn-danger btn-small">Delete</button>
+    </div>
+  `;
+  div.querySelector("button").addEventListener("click", () => openDeleteConfirm(row));
+  return div;
+}
+
+/* =========================================================
+   DELETE CONFIRM
+   ========================================================= */
+let rowToDelete = null;
+
+function openDeleteConfirm(row){
+  rowToDelete = row;
+  document.getElementById("confirm-inv-no").textContent = row.inv_odo_no;
+  document.getElementById("confirm-input").value = "";
+  document.getElementById("confirm-msg").textContent = "";
+  document.getElementById("confirm-backdrop").classList.add("active");
+}
+document.getElementById("btn-cancel-delete").addEventListener("click", () => {
+  document.getElementById("confirm-backdrop").classList.remove("active");
+  rowToDelete = null;
+});
+document.getElementById("btn-do-delete").addEventListener("click", async () => {
+  const msg = document.getElementById("confirm-msg");
+  const val = document.getElementById("confirm-input").value.trim();
+  if(val !== "CONFIRM"){
+    msg.textContent = 'You must type "CONFIRM" exactly to proceed.';
+    return;
+  }
+  let resp;
+  try{
+    resp = await callApi("deleteEntry", { id: rowToDelete.id });
+  } catch(err){ msg.textContent = "Error: "+err.message; return; }
+  if(!resp.success){ msg.textContent = "Error: "+(resp.error||""); return; }
+  document.getElementById("confirm-backdrop").classList.remove("active");
+  rowToDelete = null;
+  loadAdminPending();
+  loadAdminCompleted();
+});
+
+/* =========================================================
+   PRINTABLE REPORT (Admin)
+   ========================================================= */
+document.getElementById("btn-generate-report").addEventListener("click", async () => {
+  const start = document.getElementById("report-start").value;
+  const end = document.getElementById("report-end").value;
+  const msg = document.getElementById("report-msg");
+
+  if(!start || !end){
+    msg.className = "msg error";
+    msg.textContent = "Please select both a From Date and To Date.";
+    return;
+  }
+  if(start > end){
+    msg.className = "msg error";
+    msg.textContent = "From Date must be on or before To Date.";
+    return;
+  }
+
+  msg.className = "msg";
+  msg.textContent = "Generating report...";
+
+  let resp;
+  try{
+    resp = await callApi("listReport", { startDate: start, endDate: end });
+  } catch(err){
+    msg.className = "msg error"; msg.textContent = "Error: " + err.message; return;
+  }
+  if(!resp.success){
+    msg.className = "msg error"; msg.textContent = "Error: " + (resp.error || "");
+    return;
+  }
+  msg.textContent = "";
+  renderReport(resp.data || [], start, end);
+});
+
+function renderReport(rows, start, end){
+  const area = document.getElementById("report-print-area");
+  const tbody = document.getElementById("report-tbody");
+  tbody.innerHTML = "";
+
+  document.getElementById("report-range-label").textContent =
+    `${start} to ${end}  ·  ${rows.length} record(s)  ·  generated ${new Date().toLocaleString()}`;
+
+  if(rows.length === 0){
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:var(--muted);">No records found in this range.</td></tr>`;
+  } else {
+    rows.forEach(row => {
+      const tr = document.createElement("tr");
+      const statusClass = row.status === "COMPLETED" ? "status-completed" : "status-pending";
+      tr.innerHTML = `
+        <td>${escapeHtml(row.date)}</td>
+        <td>${escapeHtml(row.supplier)}</td>
+        <td>${escapeHtml(row.main_department)}</td>
+        <td>${escapeHtml(row.sub_department)}</td>
+        <td>${escapeHtml(row.inv_odo_no)}</td>
+        <td>${escapeHtml(row.po_no)}</td>
+        <td>${row.total_carton === "" || row.total_carton == null ? "-" : row.total_carton}</td>
+        <td>${formatMoney(row.total_amount)}</td>
+        <td>${escapeHtml(row.record_by)}</td>
+        <td>${escapeHtml(row.key_in_by) || "-"}</td>
+        <td>${escapeHtml(row.date_key_in) || "-"}</td>
+        <td class="${statusClass}">${escapeHtml(row.status)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  area.style.display = "";
+  area.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.getElementById("btn-print-report").addEventListener("click", () => {
+  window.print();
+});
+
+/* =========================================================
+   INVOICE SUMMARY
+   ========================================================= */
+let currentSummaryDept = null;
+
+document.querySelectorAll("#summary-dept-row button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#summary-dept-row button").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentSummaryDept = btn.dataset.dept;
+    const subSel = document.getElementById("summary-sub-dept");
+    const options = currentSummaryDept === "HARDLINE" ? HARDLINE_SUB_DEPTS : SOFTLINE_SUB_DEPTS;
+    populateSubDeptSelect(subSel, options, `ALL ${currentSummaryDept} SUB-DEPARTMENTS`);
+    subSel.disabled = false;
+  });
+});
+
+document.getElementById("btn-generate-summary").addEventListener("click", async () => {
+  const start = document.getElementById("summary-start").value;
+  const end = document.getElementById("summary-end").value;
+  const subDept = document.getElementById("summary-sub-dept").value;
+  const msg = document.getElementById("summary-msg");
+
+  if(!start || !end){
+    msg.className = "msg error"; msg.textContent = "Please select both a From Date and To Date.";
+    return;
+  }
+  if(start > end){
+    msg.className = "msg error"; msg.textContent = "From Date must be on or before To Date.";
+    return;
+  }
+  if(!currentSummaryDept){
+    msg.className = "msg error"; msg.textContent = "Please select a Main Department.";
+    return;
+  }
+  if(!subDept){
+    msg.className = "msg error"; msg.textContent = "Please select a Sub-Department.";
+    return;
+  }
+
+  msg.className = "msg"; msg.textContent = "Generating summary...";
+
+  const subDeptFilter = subDept === "ALL" ? "" : subDept;
+
+  let resp;
+  try{
+    resp = await callApi("listSummary", {
+      startDate: start, endDate: end,
+      mainDepartment: currentSummaryDept, subDepartment: subDeptFilter
+    });
+  } catch(err){
+    msg.className = "msg error"; msg.textContent = "Error: " + err.message; return;
+  }
+  if(!resp.success){
+    msg.className = "msg error"; msg.textContent = "Error: " + (resp.error || "");
+    return;
+  }
+  msg.textContent = "";
+  renderSummary(resp.data || [], start, end, currentSummaryDept, subDept);
+});
+
+function renderSummary(rows, start, end, mainDept, subDept){
+  const area = document.getElementById("summary-print-area");
+  const tbody = document.getElementById("summary-tbody");
+  tbody.innerHTML = "";
+
+  const subDeptLabel = subDept === "ALL" ? "All Sub-Departments" : subDept;
+  document.getElementById("summary-range-label").textContent =
+    `${mainDept} / ${subDeptLabel}  ·  ${start} to ${end}  ·  ${rows.length} record(s)  ·  generated ${new Date().toLocaleString()}`;
+
+  let grandTotal = 0;
+
+  if(rows.length === 0){
+    tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:var(--muted);">No records found for this selection.</td></tr>`;
+  } else {
+    rows.forEach(row => {
+      const amt = Number(row.total_amount);
+      if(!isNaN(amt)) grandTotal += amt;
+      const tr = document.createElement("tr");
+      const statusClass = row.status === "COMPLETED" ? "status-completed" : "status-pending";
+      tr.innerHTML = `
+        <td>${escapeHtml(row.date)}</td>
+        <td>${escapeHtml(row.supplier)}</td>
+        <td>${escapeHtml(row.main_department)}</td>
+        <td>${escapeHtml(row.sub_department)}</td>
+        <td>${escapeHtml(row.inv_odo_no)}</td>
+        <td>${escapeHtml(row.po_no)}</td>
+        <td>${row.total_carton === "" || row.total_carton == null ? "-" : row.total_carton}</td>
+        <td>${formatMoney(row.total_amount)}</td>
+        <td>${escapeHtml(row.record_by)}</td>
+        <td>${escapeHtml(row.key_in_by) || "-"}</td>
+        <td>${escapeHtml(row.date_key_in) || "-"}</td>
+        <td class="${statusClass}">${escapeHtml(row.status)}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("summary-grand-total").textContent = formatMoney(grandTotal);
+  area.style.display = "";
+  area.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.getElementById("btn-print-summary").addEventListener("click", () => {
+  window.print();
+});
+
+/* Initial load */
+loadPending();
+</script>
+</body>
+</html>
