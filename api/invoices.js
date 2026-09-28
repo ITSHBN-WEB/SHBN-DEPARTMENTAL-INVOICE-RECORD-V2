@@ -168,60 +168,6 @@ async function deleteEntry(pool, body) {
   return { success: true };
 }
 
-// One-time migration helper: inserts a batch of historical rows exported
-// from Google Sheets, preserving their original id/timestamps rather than
-// generating new ones. Protected by MIGRATION_SECRET so this can't be
-// triggered by anyone who just guesses the action name. ON CONFLICT DO
-// NOTHING makes it safe to re-run the same batch twice without duplicating.
-// Each row is inserted independently (not one big transaction) so a single
-// malformed legacy row can't block the rest of a batch from importing —
-// any failures are collected and returned for review instead.
-async function bulkImport(pool, body) {
-  if (!process.env.MIGRATION_SECRET || body.secret !== process.env.MIGRATION_SECRET) {
-    return { success: false, error: 'Invalid migration secret.' };
-  }
-  const items = Array.isArray(body.rows) ? body.rows : [];
-  if (items.length === 0) {
-    return { success: false, error: 'No rows provided.' };
-  }
-
-  let inserted = 0;
-  const errors = [];
-  for (const item of items) {
-    try {
-      const result = await pool.query(
-        `INSERT INTO invoices
-           (id, supplier, main_department, sub_department, inv_odo_no, po_no,
-            date_received, total_carton, total_amount, record_by, key_in_by,
-            date_key_in, status, created_at, completed_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
-         ON CONFLICT (id) DO NOTHING`,
-        [
-          item.id,
-          item.supplier || '',
-          item.main_department || '',
-          item.sub_department || '',
-          item.inv_odo_no || '',
-          item.po_no || '',
-          item.date_received,
-          (item.total_carton === '' || item.total_carton == null) ? null : Number(item.total_carton),
-          (item.total_amount === '' || item.total_amount == null) ? null : Number(item.total_amount),
-          item.record_by || '',
-          item.key_in_by || null,
-          item.date_key_in || null,
-          item.status || 'PENDING',
-          item.created_at || new Date().toISOString(),
-          item.completed_at || null
-        ]
-      );
-      inserted += result.rowCount;
-    } catch (err) {
-      errors.push({ id: item.id, inv_odo_no: item.inv_odo_no, error: err.message });
-    }
-  }
-  return { success: true, inserted, received: items.length, errors };
-}
-
 module.exports = async (req, res) => {
   // Allows index.html on GitHub Pages (a different origin) to call this.
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -249,7 +195,6 @@ module.exports = async (req, res) => {
       case 'updateEntry':    result = await updateEntry(pool, body); break;
       case 'completeEntry':  result = await completeEntry(pool, body); break;
       case 'deleteEntry':    result = await deleteEntry(pool, body); break;
-      case 'bulkImport':     result = await bulkImport(pool, body); break;
       default: result = { success: false, error: 'Unknown action: ' + action };
     }
     res.status(200).json(result);
