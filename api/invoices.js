@@ -64,25 +64,32 @@ async function newEntry(pool, body) {
   if (!body.date_received) {
     return { success: false, error: 'Date of Received is required.' };
   }
-  const { rows } = await pool.query(
-    `INSERT INTO invoices
-       (supplier, main_department, sub_department, inv_odo_no, po_no,
-        date_received, total_carton, total_amount, record_by)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-     RETURNING id`,
-    [
-      body.supplier || '',
-      body.main_department || '',
-      body.sub_department || '',
-      body.inv_odo_no || '',
-      body.po_no || '',
-      body.date_received,
-      (body.total_carton === '' || body.total_carton == null) ? null : Number(body.total_carton),
-      (body.total_amount === '' || body.total_amount == null) ? null : Number(body.total_amount),
-      body.record_by || ''
-    ]
-  );
-  return { success: true, id: rows[0].id };
+  try {
+    const { rows } = await pool.query(
+      `INSERT INTO invoices
+         (supplier, main_department, sub_department, inv_odo_no, po_no,
+          date_received, total_carton, total_amount, record_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+       RETURNING id`,
+      [
+        body.supplier || '',
+        body.main_department || '',
+        body.sub_department || '',
+        body.inv_odo_no || '',
+        body.po_no || '',
+        body.date_received,
+        (body.total_carton === '' || body.total_carton == null) ? null : Number(body.total_carton),
+        (body.total_amount === '' || body.total_amount == null) ? null : Number(body.total_amount),
+        body.record_by || ''
+      ]
+    );
+    return { success: true, id: rows[0].id };
+  } catch (err) {
+    if (err.code === '23505') {
+      return { success: false, error: 'Duplicate Input — an invoice with this Inv/ODO No and PO No already exists.' };
+    }
+    throw err;
+  }
 }
 
 async function listPending(pool) {
@@ -125,27 +132,34 @@ async function updateEntry(pool, body) {
   if (!body.date_received) {
     return { success: false, error: 'Date of Received is required.' };
   }
-  const { rowCount } = await pool.query(
-    `UPDATE invoices SET
-       supplier = $1, main_department = $2, sub_department = $3,
-       inv_odo_no = $4, po_no = $5, date_received = $6,
-       total_carton = $7, total_amount = $8, record_by = $9
-     WHERE id = $10`,
-    [
-      body.supplier || '',
-      body.main_department || '',
-      body.sub_department || '',
-      body.inv_odo_no || '',
-      body.po_no || '',
-      body.date_received,
-      (body.total_carton === '' || body.total_carton == null) ? null : Number(body.total_carton),
-      (body.total_amount === '' || body.total_amount == null) ? null : Number(body.total_amount),
-      body.record_by || '',
-      body.id
-    ]
-  );
-  if (rowCount === 0) return { success: false, error: 'Record not found' };
-  return { success: true };
+  try {
+    const { rowCount } = await pool.query(
+      `UPDATE invoices SET
+         supplier = $1, main_department = $2, sub_department = $3,
+         inv_odo_no = $4, po_no = $5, date_received = $6,
+         total_carton = $7, total_amount = $8, record_by = $9
+       WHERE id = $10`,
+      [
+        body.supplier || '',
+        body.main_department || '',
+        body.sub_department || '',
+        body.inv_odo_no || '',
+        body.po_no || '',
+        body.date_received,
+        (body.total_carton === '' || body.total_carton == null) ? null : Number(body.total_carton),
+        (body.total_amount === '' || body.total_amount == null) ? null : Number(body.total_amount),
+        body.record_by || '',
+        body.id
+      ]
+    );
+    if (rowCount === 0) return { success: false, error: 'Record not found' };
+    return { success: true };
+  } catch (err) {
+    if (err.code === '23505') {
+      return { success: false, error: 'Duplicate Input — another invoice with this Inv/ODO No and PO No already exists.' };
+    }
+    throw err;
+  }
 }
 
 async function completeEntry(pool, body) {
