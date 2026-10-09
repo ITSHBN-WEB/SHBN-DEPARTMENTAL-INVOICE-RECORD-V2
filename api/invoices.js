@@ -99,6 +99,17 @@ async function listPending(pool) {
   return { success: true, data: rows.map(rowToObject) };
 }
 
+// Lightweight count used by Control Tower's polling (GET ?action=pending),
+// matching the same { pendingCount } shape the other apps' endpoints use.
+// A plain COUNT(*) is cheap in Postgres with the status index — no need
+// for the sheet-index workaround the old Apps Script backend needed.
+async function countPending(pool) {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*)::int AS count FROM invoices WHERE status = 'PENDING'`
+  );
+  return rows[0].count;
+}
+
 async function listCompleted(pool, monthsBack) {
   const { rows } = await pool.query(
     `SELECT ${SELECT_COLUMNS} FROM invoices
@@ -183,14 +194,34 @@ async function deleteEntry(pool, body) {
 }
 
 module.exports = async (req, res) => {
-  // Allows index.html on GitHub Pages (a different origin) to call this.
+  // Allows index.html on GitHub Pages (a different origin) to call this,
+  // and lets Control Tower's dashboard poll it with a plain GET.
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
+
+  // GET ?action=pending — lightweight pending-count endpoint for Control
+  // Tower's dashboard, matching the shape the other apps' endpoints use
+  // ({ pendingCount }). Everything else still goes through POST below.
+  if (req.method === 'GET') {
+    if (req.query && req.query.action === 'pending') {
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+      try {
+        const pendingCount = await countPending(pool);
+        return res.status(200).json({ pendingCount });
+      } catch (err) {
+        return res.status(200).json({ pendingCount: 0, error: err.message });
+      } finally {
+        await pool.end();
+      }
+    }
+    return res.status(200).json({ status: 'SHBN Invoice API is running' });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
