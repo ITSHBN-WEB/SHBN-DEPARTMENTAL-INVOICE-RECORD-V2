@@ -316,6 +316,85 @@
     .printable-area{ position:absolute; top:0; left:0; width:100%; }
     .no-print{ display:none !important; }
   }
+
+  /* =========================================================
+     PINK GRADIENT MODERN REDESIGN + COLLAPSIBLE LEFT SIDEBAR
+     Functional form/API styles above are retained.
+     ========================================================= */
+  :root{
+    --ink:#482238; --leather:#D94F91; --leather-dark:#A92D70;
+    --paper:#FFF7FB; --paper-line:#F7D4E7; --brass:#F3A8D0;
+    --stamp-red:#C72D68; --stamp-green:#25856A; --muted:#916A80;
+    --danger:#C72D68; --radius:14px;
+    --shadow:0 12px 34px rgba(150,35,97,.12);
+    --sidebar-collapsed:76px; --sidebar-expanded:252px;
+  }
+  body{background:linear-gradient(135deg,#FCE7F3 0%,#F5D0FE 45%,#FBCFE8 100%); color:var(--ink);}
+  .app-shell{max-width:none;width:100%;margin:0;min-height:100vh;background:transparent;box-shadow:none;padding-left:var(--sidebar-collapsed);transition:padding-left .25s ease;}
+  header.title-band{min-height:82px;padding:20px 30px;background:linear-gradient(115deg,#EC4899 0%,#C0267A 55%,#9333A7 100%);color:#fff;border:0;box-shadow:0 5px 20px rgba(157,23,90,.2);align-items:center;position:relative;z-index:2;}
+  header.title-band h1{font-family:'Inter',sans-serif;font-size:clamp(1.2rem,2vw,1.65rem);font-weight:750;letter-spacing:-.035em;}
+  header.title-band .sub{color:#FFE4F1;font-size:.68rem;letter-spacing:.1em;}
+  nav.tabs.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar-collapsed);z-index:1000;display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:16px 10px;background:linear-gradient(180deg,#7E1D58 0%,#A72A70 48%,#6D1A64 100%);box-shadow:8px 0 28px rgba(106,20,75,.16);overflow:hidden;overflow-y:auto;transition:width .25s ease;padding-bottom:16px;}
+  nav.tabs.sidebar:hover,nav.tabs.sidebar:focus-within,nav.tabs.sidebar.pinned,nav.tabs.sidebar.touch-open{width:var(--sidebar-expanded);}
+  nav.tabs.sidebar button{position:static;top:auto;flex:0 0 auto;width:100%;min-height:45px;display:flex;align-items:center;gap:13px;padding:11px 13px;border:1px solid transparent;border-radius:11px;background:transparent;color:#FCE7F3;font-family:'Inter',sans-serif;font-size:.87rem;font-weight:600;text-align:left;transition:background .18s ease,border-color .18s ease,transform .18s ease;}
+  nav.tabs.sidebar button:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.12);transform:translateX(2px);}
+  nav.tabs.sidebar button.active{background:linear-gradient(100deg,#FCE7F3,#FBCFE8);color:#8E205E;box-shadow:0 5px 14px rgba(60,5,38,.16);}
+  .sidebar-brand{display:flex;align-items:center;gap:12px;min-height:50px;padding:2px 5px 13px;white-space:nowrap;color:#fff;}
+  .brand-mark{width:42px;height:42px;flex:0 0 42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#F9A8D4,#FDF2F8);color:#861653;font-weight:800;box-shadow:0 4px 12px rgba(40,0,25,.2);}
+  .sidebar-brand-text{display:flex;flex-direction:column;gap:3px;opacity:0;transition:opacity .12s ease;white-space:nowrap;}
+  .sidebar-brand-text strong{font-size:.95rem}.sidebar-brand-text small{font-size:.68rem;color:#FBCFE8;}
+  nav.tabs.sidebar:hover .sidebar-brand-text,nav.tabs.sidebar:focus-within .sidebar-brand-text,nav.tabs.sidebar.pinned .sidebar-brand-text,nav.tabs.sidebar.touch-open .sidebar-brand-text{opacity:1;transition-delay:.1s;}
+  .sidebar-divider{height:1px;background:rgba(255,255,255,.18);margin:1px 4px 7px;flex:0 0 1px;}
+  nav.tabs.sidebar .sidebar-pin{min-height:38px;margin-bottom:4px;color:#FFE4F1;font-size:.76rem;background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.1);}
+  nav.tabs.sidebar.pinned .sidebar-pin{background:rgba(255,255,255,.2);color:#fff;}
+  .pin-symbol{width:19px;flex:0 0 19px;text-align:center;font-size:1rem;}
+  .nav-icon{width:20px;flex:0 0 20px;text-align:center;font-size:1.1rem;}
+  .sidebar-label{white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .12s ease;}
+  nav.tabs.sidebar:hover .sidebar-label,nav.tabs.sidebar:focus-within .sidebar-label,nav.tabs.sidebar.pinned .sidebar-label,nav.tabs.sidebar.touch-open .sidebar-label{opacity:1;visibility:visible;transition-delay:.1s;}
+  .sidebar-footer{margin-top:auto;display:flex;align-items:center;gap:11px;padding:15px 8px 5px;color:#FBCFE8;font-size:.7rem;white-space:nowrap;border-top:1px solid rgba(255,255,255,.17);}
+  .sidebar-status-dot{width:8px;height:8px;border-radius:50%;background:#86EFAC;box-shadow:0 0 10px rgba(134,239,172,.7);flex:0 0 8px;}
+  main{padding:26px clamp(16px,3vw,38px);max-width:1600px;margin:0 auto;}
+  .welcome-banner{position:relative;display:flex;align-items:center;gap:18px;overflow:hidden;padding:23px 26px;margin-bottom:20px;border-radius:18px;color:#fff;background:linear-gradient(115deg,#EC4899 0%,#D9469A 42%,#A855C9 100%);box-shadow:0 12px 26px rgba(190,24,93,.17);}
+  .welcome-banner:after{content:"";position:absolute;width:230px;height:230px;right:-55px;top:-115px;border-radius:50%;border:1px solid rgba(255,255,255,.2);box-shadow:0 0 0 22px rgba(255,255,255,.05),0 0 0 46px rgba(255,255,255,.04);pointer-events:none;}
+  .welcome-orb{width:49px;height:49px;display:grid;place-items:center;flex:0 0 49px;border-radius:15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);font-size:1.55rem;}
+  .welcome-eyebrow{margin:0 0 5px;font-size:.68rem;letter-spacing:.14em;font-weight:700;color:#FFE4F1;}
+  .welcome-banner h2{margin:0;font-size:clamp(1.35rem,2.5vw,1.8rem);letter-spacing:-.035em;color:#fff;}
+  .welcome-copy{margin:6px 0 0;font-size:.88rem;color:#FFF1F7;line-height:1.5;}
+  .welcome-sparkle{margin-left:auto;align-self:flex-start;font-size:2.4rem;color:rgba(255,255,255,.65);z-index:1;}
+  .card{background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid #F6C8DE;border-radius:16px;padding:clamp(16px,2vw,26px);box-shadow:0 8px 24px rgba(130,30,84,.07);margin-bottom:20px;}
+  h2.section-title{font-family:'Inter',sans-serif;font-size:1.12rem;font-weight:750;color:#B52E78;padding-bottom:12px;border-bottom:1px solid #F4D1E2;margin-bottom:20px;}
+  label{color:#87566F;font-size:.72rem;letter-spacing:.055em;}
+  input,select{border:1px solid #E9B8D1;border-radius:9px;background:#FFFBFD;color:#482238;padding:12px 13px;min-height:43px;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;}
+  input:focus,select:focus{outline:none;border-color:#D9469A;box-shadow:0 0 0 3px rgba(217,70,154,.13);background:#fff;}
+  input[readonly]{background:#FCE7F3;color:#80516B;}
+  .btn{border-radius:9px;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;}
+  .btn-primary{background:linear-gradient(110deg,#EC4899,#BE287E);color:#fff;box-shadow:0 5px 12px rgba(190,40,126,.18);}
+  .btn-primary:hover{background:linear-gradient(110deg,#DB2777,#9D246B);transform:translateY(-1px);box-shadow:0 7px 16px rgba(190,40,126,.24);}
+  .btn-ghost{color:#B52E78;border-color:#D98CB5;}
+  .subtabs button.active,.dept-row button.active{background:linear-gradient(110deg,#EC4899,#BE287E);color:#fff;border-color:transparent;}
+  .subtabs button,.dept-row button{border-color:#D98CB5;color:#B52E78;}
+  ul.record-list li:hover{background:#FFF0F7;}
+  ul.record-list li .inv-no,.admin-row .inv-no{color:#B52E78;}
+  .stamp.pending{color:#C47A17;}
+  .printable-area th{border-bottom-color:#D9469A;color:#B52E78;}
+  .grand-total{border-top-color:#D9469A;color:#B52E78;}
+  .modal{border:1px solid #F3C7DD;}
+  @media(max-width:700px){
+    :root{--sidebar-collapsed:58px;--sidebar-expanded:min(252px,84vw);}
+    nav.tabs.sidebar{padding:12px 6px;gap:5px;}
+    nav.tabs.sidebar button{padding:10px 9px;gap:10px;min-height:43px;font-size:.82rem;}
+    .sidebar-brand{padding-left:1px}.brand-mark{width:40px;height:40px;flex-basis:40px;}
+    header.title-band{padding:17px 16px;align-items:flex-start;flex-direction:column;gap:5px;}
+    header.title-band .sub{font-size:.6rem;}
+    main{padding:18px 12px;}
+    .welcome-banner{padding:18px 16px;gap:12px;align-items:flex-start;}
+    .welcome-orb{width:40px;height:40px;flex-basis:40px;border-radius:12px;}
+    .welcome-copy{font-size:.8rem;}
+    .welcome-sparkle{display:none;}
+    .card{padding:16px;}
+  }
+  @media(prefers-reduced-motion:reduce){.app-shell,nav.tabs.sidebar,nav.tabs.sidebar button,.btn{transition:none!important;}}
+
 </style>
 </head>
 <body>
@@ -326,17 +405,26 @@
     <div class="sub">SHBN &middot; Ledger No. Live</div>
   </header>
 
-  <nav class="tabs">
-    <button data-tab="new" class="active">New Entry</button>
-    <button data-tab="pending">Pending Invoice</button>
-    <button data-tab="summary">Invoice Summary</button>
-    <button data-tab="admin">Admin</button>
+  <nav class="tabs sidebar" id="app-sidebar" aria-label="Main navigation">
+    <div class="sidebar-brand"><span class="brand-mark">DI</span><span class="sidebar-brand-text"><strong>SHBN Invoice</strong><small>Departmental Ledger</small></span></div>
+    <button type="button" class="sidebar-pin" id="sidebar-pin" aria-pressed="false" title="Pin sidebar open"><span class="pin-symbol">📌</span><span class="sidebar-label">Pin menu open</span></button>
+    <div class="sidebar-divider"></div>
+    <button data-tab="new" class="active" title="New Entry"><span class="nav-icon">✚</span><span class="sidebar-label">New Entry</span></button>
+    <button data-tab="pending" title="Pending Invoice"><span class="nav-icon">◷</span><span class="sidebar-label">Pending Invoice</span></button>
+    <button data-tab="summary" title="Invoice Summary"><span class="nav-icon">▤</span><span class="sidebar-label">Invoice Summary</span></button>
+    <button data-tab="admin" title="Admin"><span class="nav-icon">⚙</span><span class="sidebar-label">Admin</span></button>
+    <div class="sidebar-footer"><span class="sidebar-status-dot"></span><span class="sidebar-label">SHBN internal system</span></div>
   </nav>
 
   <main>
 
     <!-- NEW ENTRY -->
     <section id="panel-new" class="panel active">
+      <div class="welcome-banner">
+        <div class="welcome-orb">✦</div>
+        <div><p class="welcome-eyebrow" id="greeting-date">WELCOME TO YOUR WORKSPACE</p><h2 id="greeting-title">Good day!</h2><p class="welcome-copy">Ready to record a new departmental invoice? Let’s keep every record accurate and up to date.</p></div>
+        <div class="welcome-sparkle" aria-hidden="true">✧</div>
+      </div>
       <div class="card">
         <h2 class="section-title">New Invoice Entry</h2>
         <div class="field-grid">
@@ -779,7 +867,7 @@ document.addEventListener("input", (e) => {
 /* =========================================================
    Tab navigation
    ========================================================= */
-document.querySelectorAll("nav.tabs button").forEach(btn => {
+document.querySelectorAll("nav.tabs button[data-tab]").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
@@ -1652,6 +1740,51 @@ function renderSummary(rows, start, end, mainDept, subDept){
 document.getElementById("btn-print-summary").addEventListener("click", () => {
   window.print();
 });
+
+/* =========================================================
+   Collapsible sidebar + greeting for New Entry
+   ========================================================= */
+(function setupSidebar(){
+  const sidebar = document.getElementById("app-sidebar");
+  const pin = document.getElementById("sidebar-pin");
+  if(!sidebar || !pin) return;
+  let pinned = false;
+  try { pinned = localStorage.getItem("shbn-invoice-sidebar-pinned") === "1"; } catch(e) {}
+  function applyPinnedState(){
+    sidebar.classList.toggle("pinned", pinned);
+    pin.setAttribute("aria-pressed", String(pinned));
+    pin.title = pinned ? "Unpin sidebar (auto-collapse enabled)" : "Pin sidebar open";
+    const label = pin.querySelector(".sidebar-label");
+    if(label) label.textContent = pinned ? "Unpin menu" : "Pin menu open";
+  }
+  pin.addEventListener("click", function(e){
+    e.preventDefault(); e.stopPropagation();
+    pinned = !pinned;
+    try { localStorage.setItem("shbn-invoice-sidebar-pinned", pinned ? "1" : "0"); } catch(e) {}
+    applyPinnedState();
+  });
+  // On touch screens there is no hover: tapping the edge toggles temporary expansion.
+  sidebar.addEventListener("click", function(e){
+    if(window.matchMedia("(hover: none)").matches && !pinned && !e.target.closest("button[data-tab]") && !e.target.closest("#sidebar-pin")){
+      sidebar.classList.toggle("touch-open");
+    }
+  });
+  document.addEventListener("click", function(e){
+    if(window.matchMedia("(hover: none)").matches && !sidebar.contains(e.target) && !pinned) sidebar.classList.remove("touch-open");
+  });
+  applyPinnedState();
+})();
+
+function updateNewEntryGreeting(){
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning!" : hour < 18 ? "Good afternoon!" : "Good evening!";
+  const title = document.getElementById("greeting-title");
+  const date = document.getElementById("greeting-date");
+  if(title) title.textContent = greeting;
+  if(date) date.textContent = now.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"}).toUpperCase();
+}
+updateNewEntryGreeting();
 
 /* Initial load */
 loadPending();
