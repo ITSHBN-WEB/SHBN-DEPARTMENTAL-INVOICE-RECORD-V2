@@ -155,6 +155,26 @@
   .btn-ghost{ background:transparent; color:var(--leather); border:1px solid var(--leather); }
   .btn-danger{ background:var(--stamp-red); color:#fff; }
   .btn-small{ padding:6px 12px; font-size:0.78rem; }
+
+  .hidden{ display:none !important; }
+  .mode-toggle{ display:inline-flex; gap:6px; margin-bottom:16px; }
+  .mode-toggle button{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:0.85rem;
+    padding:8px 18px; border-radius:999px; cursor:pointer;
+    background:transparent; color:var(--leather); border:1px solid var(--leather);
+  }
+  .mode-toggle button.active{ background:var(--leather); color:var(--paper); }
+  .bulk-sec{ border:1px dashed var(--brass); border-radius:10px; padding:14px 14px 12px; margin-bottom:14px; }
+  .bulk-sec h3{ margin:0 0 10px; font-size:0.82rem; letter-spacing:.04em; text-transform:uppercase; color:var(--leather); }
+  .bulk-sec .actions-row{ margin-top:12px; }
+  .bulk-table-wrap{ overflow-x:auto; }
+  .bulk-table{ width:100%; border-collapse:collapse; font-size:0.8rem; min-width:640px; }
+  .bulk-table th,.bulk-table td{ padding:7px 8px; text-align:left; border-bottom:1px solid #F0CBD6; }
+  .bulk-table th{ font-size:0.72rem; text-transform:uppercase; letter-spacing:.04em; color:var(--leather); }
+  .bulk-table td.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .bulk-table tr.dup-row td{ background:#FBD9E2; color:var(--stamp-red); font-weight:600; }
+  .bulk-table tfoot td{ font-weight:700; border-bottom:none; }
+  .bulk-empty{ font-size:0.82rem; color:#8a6a76; padding:8px 0; }
   .actions-row{ margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
   .msg{ font-size:0.85rem; margin-top:10px; min-height:18px; }
   .msg.error{ color:var(--stamp-red); }
@@ -422,6 +442,13 @@
     <section id="panel-new" class="panel">
       <div class="card">
         <h2 class="section-title">New Invoice Entry</h2>
+        <div class="mode-toggle" id="entry-mode-toggle">
+          <button type="button" data-mode="single" class="active">Single Entry</button>
+          <button type="button" data-mode="bulk">Bulk Entry</button>
+        </div>
+
+        <!-- SINGLE ENTRY -->
+        <div id="single-form">
         <div class="field-grid">
           <div>
             <label>Supplier <span class="req">*</span></label>
@@ -469,8 +496,101 @@
         </div>
         <div class="actions-row">
           <button class="btn btn-primary" id="btn-submit-new">Submit Entry</button>
+          <button class="btn btn-ghost btn-small" id="btn-clear-single" type="button">Clear</button>
         </div>
         <div class="msg" id="new-msg"></div>
+        </div>
+
+        <!-- BULK ENTRY -->
+        <div id="bulk-form" class="hidden">
+          <div class="bulk-sec">
+            <h3>1 · Details for all invoices</h3>
+            <div class="field-grid">
+              <div>
+                <label>Supplier <span class="req">*</span></label>
+                <input type="text" id="b-supplier" class="uc">
+              </div>
+              <div>
+                <label>Main Department <span class="req">*</span></label>
+                <select id="b-main-dept">
+                  <option value="">-- SELECT --</option>
+                  <option value="HARDLINE">HARDLINE</option>
+                  <option value="SOFTLINE">SOFTLINE</option>
+                  <option value="EG">EG</option>
+                  <option value="CONSIGNMENT">CONSIGNMENT</option>
+                </select>
+              </div>
+              <div>
+                <label>Date of Received <span class="req">*</span></label>
+                <input type="date" id="b-date-received">
+              </div>
+              <div>
+                <label>Record By <span class="req">*</span></label>
+                <input type="text" id="b-recordby" class="uc">
+              </div>
+            </div>
+            <div class="actions-row">
+              <button class="btn btn-ghost btn-small" id="btn-b-clear-shared" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="bulk-sec">
+            <h3>2 · Add each invoice</h3>
+            <div class="field-grid">
+              <div>
+                <label>Sub-Department / Brand <span class="req">*</span></label>
+                <select id="b-sub-select" disabled></select>
+                <input type="text" id="b-sub-input" class="uc brand-input" placeholder="ENTER BRAND NAME">
+              </div>
+              <div>
+                <label>Inv / ODO No <span class="req">*</span></label>
+                <input type="text" id="b-inv" class="uc">
+              </div>
+              <div>
+                <label>PO No <span class="req">*</span></label>
+                <input type="text" id="b-po" class="uc">
+              </div>
+              <div>
+                <label>Total Carton</label>
+                <input type="number" step="any" id="b-carton">
+              </div>
+              <div>
+                <label>Total Amount</label>
+                <input type="number" step="any" id="b-amount">
+              </div>
+            </div>
+            <div class="actions-row">
+              <button class="btn btn-primary btn-small" id="btn-b-add" type="button">Add to List</button>
+              <button class="btn btn-ghost btn-small" id="btn-b-clear-item" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="bulk-sec">
+            <h3>3 · List to submit (<span id="b-count">0</span>)</h3>
+            <div id="b-empty" class="bulk-empty">No invoices added yet.</div>
+            <div class="bulk-table-wrap">
+              <table class="bulk-table hidden" id="b-table">
+                <thead><tr>
+                  <th>#</th><th>Sub-Dept / Brand</th><th>Inv / ODO No</th><th>PO No</th>
+                  <th style="text-align:right">Carton</th><th style="text-align:right">Amount</th><th></th>
+                </tr></thead>
+                <tbody id="b-tbody"></tbody>
+                <tfoot><tr>
+                  <td colspan="4">Total</td>
+                  <td class="num" id="b-total-carton">0</td>
+                  <td class="num" id="b-total-amount">0.00</td>
+                  <td></td>
+                </tr></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <div class="actions-row">
+            <button class="btn btn-primary" id="btn-b-submit" type="button">Submit All</button>
+            <button class="btn btn-ghost" id="btn-b-cancel" type="button">Cancel</button>
+          </div>
+          <div class="msg" id="bulk-msg"></div>
+        </div>
       </div>
     </section>
 
@@ -792,6 +912,7 @@ function populateSubDeptSelect(selectEl, options, allLabel){
   });
 }
 populateSubDeptSelect(document.getElementById("f-sub-dept-select"));
+populateSubDeptSelect(document.getElementById("b-sub-select"));
 populateSubDeptSelect(document.getElementById("d-sub-dept-select"));
 populateSubDeptSelect(document.getElementById("summary-sub-dept"));
 
@@ -830,19 +951,22 @@ function ddmmyyyyToIso(str){
 // Main Department must be selected before Sub-Department becomes editable
 // (New Entry form). Consignment swaps the fixed dropdown for a free-text
 // brand field, since consignment brands aren't part of the fixed list.
-document.getElementById("f-main-dept").addEventListener("change", (e) => {
-  const sel = document.getElementById("f-sub-dept-select");
-  const inp = document.getElementById("f-sub-dept-input");
-  if(e.target.value === "CONSIGNMENT"){
+function applyDeptControls(mainVal, sel, inp){
+  if(mainVal === "CONSIGNMENT"){
     sel.style.display = "none"; sel.disabled = true; sel.value = "";
     inp.classList.remove("brand-input"); inp.value = "";
-  } else if(e.target.value){
-    sel.style.display = ""; sel.disabled = false;
+  } else if(mainVal){
+    sel.style.display = ""; sel.disabled = false; sel.value = "";
     inp.classList.add("brand-input"); inp.value = "";
   } else {
     sel.style.display = ""; sel.disabled = true; sel.value = "";
     inp.classList.add("brand-input"); inp.value = "";
   }
+}
+document.getElementById("f-main-dept").addEventListener("change", (e) => {
+  applyDeptControls(e.target.value,
+    document.getElementById("f-sub-dept-select"),
+    document.getElementById("f-sub-dept-input"));
 });
 function getNewEntrySubDept(){
   const mainDept = document.getElementById("f-main-dept").value;
@@ -916,6 +1040,171 @@ document.querySelectorAll(".bucket-row button[data-abucket]").forEach(btn => {
 /* =========================================================
    NEW ENTRY
    ========================================================= */
+function clearSingleEntryForm(){
+  ["f-supplier","f-inv","f-po","f-date-received","f-carton","f-amount","f-recordby"].forEach(id=>{
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("f-main-dept").value = "";
+  applyDeptControls("", document.getElementById("f-sub-dept-select"), document.getElementById("f-sub-dept-input"));
+}
+document.getElementById("btn-clear-single").addEventListener("click", () => {
+  clearSingleEntryForm();
+  const m = document.getElementById("new-msg"); m.className = "msg"; m.textContent = "";
+});
+
+/* ---- Single / Bulk mode toggle ---- */
+document.querySelectorAll("#entry-mode-toggle button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#entry-mode-toggle button").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const bulk = btn.dataset.mode === "bulk";
+    document.getElementById("single-form").classList.toggle("hidden", bulk);
+    document.getElementById("bulk-form").classList.toggle("hidden", !bulk);
+  });
+});
+
+/* ---- Bulk entry ---- */
+let bulkList = [];
+const bEl = id => document.getElementById(id);
+function bulkMsg(text, kind){ const m = bEl("bulk-msg"); m.className = "msg" + (kind ? " " + kind : ""); m.textContent = text; }
+function getBulkSubDept(){
+  return bEl("b-main-dept").value === "CONSIGNMENT" ? bEl("b-sub-input").value.trim() : bEl("b-sub-select").value;
+}
+function setBulkSharedLocked(locked){
+  ["b-supplier","b-main-dept","b-date-received","b-recordby"].forEach(id => { bEl(id).disabled = locked; });
+}
+function clearBulkItemInputs(){
+  ["b-inv","b-po","b-carton","b-amount"].forEach(id => { bEl(id).value = ""; });
+  applyDeptControls(bEl("b-main-dept").value, bEl("b-sub-select"), bEl("b-sub-input"));
+}
+function clearBulkShared(){
+  ["b-supplier","b-date-received","b-recordby"].forEach(id => { bEl(id).value = ""; });
+  bEl("b-main-dept").value = "";
+  applyDeptControls("", bEl("b-sub-select"), bEl("b-sub-input"));
+}
+function resetBulkAll(){
+  bulkList = [];
+  setBulkSharedLocked(false);
+  clearBulkShared();
+  clearBulkItemInputs();
+  renderBulkList();
+}
+function renderBulkList(dupIdx){
+  const dups = new Set(dupIdx || []);
+  const tbody = bEl("b-tbody");
+  tbody.innerHTML = "";
+  let carton = 0, amount = 0;
+  bulkList.forEach((r, i) => {
+    carton += Number(r.total_carton) || 0;
+    amount += Number(r.total_amount) || 0;
+    const tr = document.createElement("tr");
+    if(dups.has(i)) tr.className = "dup-row";
+    tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(r.sub_department)}</td><td>${escapeHtml(r.inv_odo_no)}</td><td>${escapeHtml(r.po_no)}</td>` +
+      `<td class="num">${r.total_carton == null ? "-" : escapeHtml(String(r.total_carton))}</td>` +
+      `<td class="num">${r.total_amount == null ? "-" : formatMoney(r.total_amount)}</td>` +
+      `<td><button type="button" class="btn btn-ghost btn-small" data-remove="${i}">Remove</button></td>`;
+    tbody.appendChild(tr);
+  });
+  bEl("b-count").textContent = bulkList.length;
+  bEl("b-total-carton").textContent = carton;
+  bEl("b-total-amount").textContent = formatMoney(amount);
+  bEl("b-table").classList.toggle("hidden", bulkList.length === 0);
+  bEl("b-empty").classList.toggle("hidden", bulkList.length > 0);
+  bEl("btn-b-submit").textContent = bulkList.length ? `Submit All (${bulkList.length})` : "Submit All";
+}
+bEl("b-main-dept").addEventListener("change", e => {
+  applyDeptControls(e.target.value, bEl("b-sub-select"), bEl("b-sub-input"));
+});
+bEl("btn-b-add").addEventListener("click", () => {
+  const supplier = bEl("b-supplier").value.trim();
+  const mainDept = bEl("b-main-dept").value;
+  const dateReceived = bEl("b-date-received").value;
+  const recordby = bEl("b-recordby").value.trim();
+  if(!supplier || !mainDept || !dateReceived || !recordby){
+    bulkMsg("Please fill in Supplier, Main Department, Date of Received and Record By first (section 1).", "error"); return;
+  }
+  const sub = getBulkSubDept();
+  const inv = bEl("b-inv").value.trim();
+  const po = bEl("b-po").value.trim();
+  if(!sub || !inv || !po){
+    bulkMsg("Please fill in Sub-Department/Brand, Inv/ODO No and PO No.", "error"); return;
+  }
+  if(bulkList.some(r => r.inv_odo_no === inv && r.po_no === po)){
+    bulkMsg("Duplicate Input — this Inv/ODO No and PO No is already in the list.", "error"); return;
+  }
+  const carton = bEl("b-carton").value, amount = bEl("b-amount").value;
+  bulkList.push({
+    sub_department: sub, inv_odo_no: inv, po_no: po,
+    total_carton: carton === "" ? null : Number(carton),
+    total_amount: amount === "" ? null : Number(amount)
+  });
+  setBulkSharedLocked(true);
+  // keep Sub-Dept/Brand for the next invoice (often the same); clear the rest
+  ["b-inv","b-po","b-carton","b-amount"].forEach(id => { bEl(id).value = ""; });
+  renderBulkList();
+  bulkMsg(`Added to list (${bulkList.length}). Add more, or Submit All when done.`, "ok");
+  bEl("b-inv").focus();
+});
+["b-inv","b-po","b-carton","b-amount"].forEach(id => {
+  bEl(id).addEventListener("keydown", e => { if(e.key === "Enter"){ e.preventDefault(); bEl("btn-b-add").click(); } });
+});
+bEl("b-tbody").addEventListener("click", e => {
+  const btn = e.target.closest("button[data-remove]");
+  if(!btn) return;
+  bulkList.splice(Number(btn.dataset.remove), 1);
+  if(bulkList.length === 0) setBulkSharedLocked(false);
+  renderBulkList();
+  bulkMsg("", "");
+});
+bEl("btn-b-clear-item").addEventListener("click", () => { clearBulkItemInputs(); bulkMsg("", ""); });
+bEl("btn-b-clear-shared").addEventListener("click", () => {
+  if(bulkList.length){
+    if(!confirm(`Clearing these fields will also remove the ${bulkList.length} invoice(s) already in the list. Continue?`)) return;
+    bulkList = [];
+    setBulkSharedLocked(false);
+    renderBulkList();
+  }
+  clearBulkShared();
+  bulkMsg("", "");
+});
+bEl("btn-b-cancel").addEventListener("click", () => {
+  const dirty = bulkList.length || ["b-supplier","b-recordby","b-date-received","b-inv","b-po","b-carton","b-amount","b-main-dept"].some(id => bEl(id).value);
+  if(dirty && !confirm("Cancel this bulk entry? Everything entered will be cleared.")) return;
+  resetBulkAll();
+  bulkMsg("Bulk entry cancelled.", "");
+});
+bEl("btn-b-submit").addEventListener("click", async () => {
+  if(bulkList.length === 0){ bulkMsg("Add at least one invoice to the list before submitting.", "error"); return; }
+  const supplier = bEl("b-supplier").value.trim();
+  const mainDept = bEl("b-main-dept").value;
+  const dateReceived = bEl("b-date-received").value;
+  const recordby = bEl("b-recordby").value.trim();
+  const entries = bulkList.map(r => ({
+    supplier, main_department: mainDept, date_received: dateReceived, record_by: recordby,
+    sub_department: r.sub_department, inv_odo_no: r.inv_odo_no, po_no: r.po_no,
+    total_carton: r.total_carton, total_amount: r.total_amount
+  }));
+  const btn = bEl("btn-b-submit");
+  btn.disabled = true;
+  bulkMsg("Submitting...", "");
+  let resp;
+  try{
+    resp = await callApi("newEntries", { entries });
+  } catch(err){
+    btn.disabled = false;
+    bulkMsg("Error: " + err.message, "error"); return;
+  }
+  btn.disabled = false;
+  if(!resp.success){
+    renderBulkList(resp.duplicates);
+    bulkMsg("Error: " + (resp.error || "Could not submit entries.") + (resp.duplicates ? " Highlighted rows are the duplicates — remove them and submit again." : ""), "error");
+    return;
+  }
+  const n = resp.count || entries.length;
+  resetBulkAll();
+  bulkMsg(`${n} invoice(s) submitted successfully.`, "ok");
+});
+
 document.getElementById("btn-submit-new").addEventListener("click", async () => {
   const supplier = document.getElementById("f-supplier").value.trim();
   const mainDept = document.getElementById("f-main-dept").value;
@@ -964,16 +1253,7 @@ document.getElementById("btn-submit-new").addEventListener("click", async () => 
   }
   msg.className = "msg ok";
   msg.textContent = "Entry submitted successfully.";
-  ["f-supplier","f-inv","f-po","f-date-received","f-carton","f-amount","f-recordby"].forEach(id=>{
-    document.getElementById(id).value = "";
-  });
-  document.getElementById("f-main-dept").value = "";
-  document.getElementById("f-sub-dept-select").value = "";
-  document.getElementById("f-sub-dept-select").disabled = true;
-  document.getElementById("f-sub-dept-select").style.display = "";
-  document.getElementById("f-sub-dept-input").value = "";
-  document.getElementById("f-sub-dept-input").style.display = "none";
-  document.getElementById("f-sub-dept-input").classList.add("brand-input");
+  clearSingleEntryForm();
 });
 
 /* =========================================================
