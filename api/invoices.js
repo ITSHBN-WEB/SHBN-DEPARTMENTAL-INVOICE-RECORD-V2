@@ -92,6 +92,76 @@ async function newEntry(pool, body) {
   }
 }
 
+// Bulk entry: inserts many invoices in ONE statement, so it is all-or-nothing
+// (Postgres treats a single INSERT as atomic). Duplicates are pre-checked so
+// the app can tell the user exactly which rows (by index) already exist,
+// instead of a vague database error.
+async function newEntries(pool, body) {
+  const rows = Array.isArray(body.entries) ? body.entries : [];
+  if (rows.length === 0) return { success: false, error: 'No invoices to submit.' };
+  if (rows.length > 200) return { success: false, error: 'Too many invoices in one batch (max 200).' };
+
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r.supplier || !r.main_department || !r.sub_department || !r.inv_odo_no || !r.po_no || !r.date_received || !r.record_by) {
+      return { success: false, error: `Row ${i + 1} is missing a required field.` };
+    }
+  }
+
+  // Duplicates inside the batch itself
+  const seen = new Map();
+  const dupIdx = [];
+  rows.forEach((r, i) => {
+    const key = r.inv_odo_no + '\u0000' + r.po_no;
+    if (seen.has(key)) { dupIdx.push(i); } else { seen.set(key, i); }
+  });
+  if (dupIdx.length) {
+    return { success: false, error: 'Duplicate Input — the same Inv/ODO No and PO No appears more than once in the list.', duplicates: dupIdx };
+  }
+
+  // Duplicates already in the database
+  const existing = await pool.query(
+    `SELECT inv_odo_no, po_no FROM invoices
+     WHERE (inv_odo_no, po_no) IN (SELECT * FROM unnest($1::text[], $2::text[]))`,
+    [rows.map(r => r.inv_odo_no), rows.map(r => r.po_no)]
+  );
+  if (existing.rows.length) {
+    const exist = new Set(existing.rows.map(r => r.inv_odo_no + '\u0000' + r.po_no));
+    const duplicates = [];
+    rows.forEach((r, i) => { if (exist.has(r.inv_odo_no + '\u0000' + r.po_no)) duplicates.push(i); });
+    return { success: false, error: 'Duplicate Input — some invoices already exist. Nothing was submitted.', duplicates };
+  }
+
+  const params = [];
+  const values = rows.map(r => {
+    params.push(
+      r.supplier, r.main_department, r.sub_department, r.inv_odo_no, r.po_no,
+      r.date_received,
+      (r.total_carton === '' || r.total_carton == null) ? null : Number(r.total_carton),
+      (r.total_amount === '' || r.total_amount == null) ? null : Number(r.total_amount),
+      r.record_by
+    );
+    const b = params.length - 9;
+    return `($${b+1},$${b+2},$${b+3},$${b+4},$${b+5},$${b+6},$${b+7},$${b+8},$${b+9})`;
+  });
+
+  try {
+    await pool.query(
+      `INSERT INTO invoices
+         (supplier, main_department, sub_department, inv_odo_no, po_no,
+          date_received, total_carton, total_amount, record_by)
+       VALUES ${values.join(',')}`,
+      params
+    );
+    return { success: true, count: rows.length };
+  } catch (err) {
+    if (err.code === '23505') {
+      return { success: false, error: 'Duplicate Input — an invoice with the same Inv/ODO No and PO No already exists. Nothing was submitted.' };
+    }
+    throw err;
+  }
+}
+
 async function listPending(pool) {
   const { rows } = await pool.query(
     `SELECT ${SELECT_COLUMNS} FROM invoices WHERE status = 'PENDING' ORDER BY created_at DESC`
@@ -275,6 +345,7 @@ module.exports = async (req, res) => {
     let result;
     switch (action) {
       case 'newEntry':       result = await newEntry(pool, body); break;
+      case 'newEntries':     result = await newEntries(pool, body); break;
       case 'listPending':    result = await listPending(pool); break;
       case 'listCompleted':  result = await listCompleted(pool, body.monthsBack); break;
       case 'listReport':     result = await listReport(pool, body.startDate, body.endDate); break;
