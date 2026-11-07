@@ -310,94 +310,63 @@
   .list-toggle-row{ display:flex; justify-content:flex-end; margin-bottom:8px; }
   .brand-input{ display:none; }
 
+  /* ---------- Home dashboard ---------- */
+  .home-hero{
+    display:flex; justify-content:space-between; align-items:center;
+    gap:16px; flex-wrap:wrap;
+  }
+  .home-hero h2{
+    font-family:'Fraunces',serif; font-weight:600; font-size:1.7rem;
+    color:var(--leather-dark); margin:0 0 4px;
+  }
+  .home-hero .hero-date{
+    font-family:'JetBrains Mono',monospace; font-size:0.75rem;
+    letter-spacing:0.04em; color:var(--muted); text-transform:uppercase;
+  }
+  .home-hero .hero-line{ margin:8px 0 0; font-size:0.92rem; color:var(--ink); }
+  .home-grid{
+    display:grid; grid-template-columns:3fr 2fr; gap:18px; align-items:start;
+  }
+  @media (max-width:860px){ .home-grid{ grid-template-columns:1fr; } }
+  .pending-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px;
+  }
+  .pending-card{
+    background:#fff; border:1px solid var(--paper-line); border-top:4px solid var(--brass);
+    border-radius:var(--radius); padding:14px 16px 16px;
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .pending-card .dept{
+    font-family:'Fraunces',serif; font-weight:600; font-size:1rem; color:var(--leather-dark);
+  }
+  .pending-card .num{
+    font-family:'JetBrains Mono',monospace; font-weight:700; font-size:2.5rem;
+    line-height:1.1; color:var(--stamp-red);
+  }
+  .pending-card .num.zero{ color:var(--stamp-green); }
+  .pending-card .caption{ font-size:0.78rem; color:var(--muted); margin-bottom:8px; }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;
+  }
+  .section-head h2.section-title{ margin:0; }
+  .activity-list{ list-style:none; margin:0; padding:0; }
+  .activity-list li{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:11px 4px; border-bottom:1px dashed var(--paper-line);
+  }
+  .activity-list li:last-child{ border-bottom:none; }
+  .activity-list .stamp{ flex-shrink:0; margin-top:2px; }
+  .activity-list .body{ flex:1; min-width:0; }
+  .activity-list .inv-no{ font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--leather-dark); overflow-wrap:anywhere; }
+  .activity-list .meta{ font-size:0.76rem; color:var(--muted); overflow-wrap:anywhere; }
+  .activity-list .when{ flex-shrink:0; font-size:0.74rem; color:var(--muted); white-space:nowrap; margin-top:3px; }
+
   @media print{
     body *{ visibility:hidden; }
     .printable-area, .printable-area *{ visibility:visible; }
     .printable-area{ position:absolute; top:0; left:0; width:100%; }
     .no-print{ display:none !important; }
   }
-
-  /* =========================================================
-     PINK GRADIENT MODERN REDESIGN + COLLAPSIBLE LEFT SIDEBAR
-     Functional form/API styles above are retained.
-     ========================================================= */
-  :root{
-    --ink:#482238; --leather:#D94F91; --leather-dark:#A92D70;
-    --paper:#FFF7FB; --paper-line:#F7D4E7; --brass:#F3A8D0;
-    --stamp-red:#C72D68; --stamp-green:#25856A; --muted:#916A80;
-    --danger:#C72D68; --radius:14px;
-    --shadow:0 12px 34px rgba(150,35,97,.12);
-    --sidebar-collapsed:76px; --sidebar-expanded:252px;
-  }
-  body{background:linear-gradient(135deg,#FCE7F3 0%,#F5D0FE 45%,#FBCFE8 100%); color:var(--ink);}
-  .app-shell{max-width:none;width:100%;margin:0;min-height:100vh;background:transparent;box-shadow:none;padding-left:var(--sidebar-collapsed);}
-  header.title-band{min-height:82px;padding:20px 30px;background:linear-gradient(115deg,#EC4899 0%,#C0267A 55%,#9333A7 100%);color:#fff;border:0;box-shadow:0 2px 8px rgba(157,23,90,.12);align-items:center;position:relative;z-index:2;}
-  header.title-band h1{font-family:'Inter',sans-serif;font-size:clamp(1.2rem,2vw,1.65rem);font-weight:750;letter-spacing:-.035em;}
-  header.title-band .sub{color:#FFE4F1;font-size:.68rem;letter-spacing:.1em;}
-  nav.tabs.sidebar{position:fixed;inset:0 auto 0 0;width:var(--sidebar-collapsed);z-index:1000;display:flex;flex-direction:column;align-items:stretch;gap:7px;padding:16px 10px;background:linear-gradient(180deg,#7E1D58 0%,#A72A70 48%,#6D1A64 100%);box-shadow:3px 0 8px rgba(106,20,75,.10);overflow:hidden;overflow-y:auto;transition:none;padding-bottom:16px;}
-  nav.tabs.sidebar:hover,nav.tabs.sidebar.pinned,nav.tabs.sidebar.touch-open{width:var(--sidebar-expanded);}
-  nav.tabs.sidebar button{position:static;top:auto;flex:0 0 auto;width:100%;min-height:45px;display:flex;align-items:center;gap:13px;padding:11px 13px;border:1px solid transparent;border-radius:11px;background:transparent;color:#FCE7F3;font-family:'Inter',sans-serif;font-size:.87rem;font-weight:600;text-align:left;transition:background .12s ease,border-color .12s ease;}
-  nav.tabs.sidebar button:hover{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.12);}
-  nav.tabs.sidebar button.active{background:linear-gradient(100deg,#FCE7F3,#FBCFE8);color:#8E205E;box-shadow:0 5px 14px rgba(60,5,38,.16);}
-  .sidebar-brand{display:flex;align-items:center;gap:12px;min-height:50px;padding:2px 5px 13px;white-space:nowrap;color:#fff;}
-  .brand-mark{width:42px;height:42px;flex:0 0 42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#F9A8D4,#FDF2F8);color:#861653;font-weight:800;box-shadow:0 4px 12px rgba(40,0,25,.2);}
-  .sidebar-brand-text{display:flex;flex-direction:column;gap:3px;opacity:0;transition:opacity .12s ease;white-space:nowrap;}
-  .sidebar-brand-text strong{font-size:.95rem}.sidebar-brand-text small{font-size:.68rem;color:#FBCFE8;}
-  nav.tabs.sidebar:hover .sidebar-brand-text,nav.tabs.sidebar.pinned .sidebar-brand-text,nav.tabs.sidebar.touch-open .sidebar-brand-text{opacity:1;transition-delay:0s;}
-  .sidebar-divider{height:1px;background:rgba(255,255,255,.18);margin:1px 4px 7px;flex:0 0 1px;}
-  nav.tabs.sidebar .sidebar-pin{min-height:38px;margin-bottom:4px;color:#FFE4F1;font-size:.76rem;background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.1);}
-  nav.tabs.sidebar.pinned .sidebar-pin{background:rgba(255,255,255,.2);color:#fff;}
-  .pin-symbol{width:19px;flex:0 0 19px;text-align:center;font-size:1rem;}
-  .nav-icon{width:20px;flex:0 0 20px;text-align:center;font-size:1.1rem;}
-  .sidebar-label{white-space:nowrap;opacity:0;visibility:hidden;transition:opacity .12s ease;}
-  nav.tabs.sidebar:hover .sidebar-label,nav.tabs.sidebar.pinned .sidebar-label,nav.tabs.sidebar.touch-open .sidebar-label{opacity:1;visibility:visible;transition-delay:0s;}
-  .sidebar-footer{margin-top:auto;display:flex;align-items:center;gap:11px;padding:15px 8px 5px;color:#FBCFE8;font-size:.7rem;white-space:nowrap;border-top:1px solid rgba(255,255,255,.17);}
-  .sidebar-status-dot{width:8px;height:8px;border-radius:50%;background:#86EFAC;box-shadow:0 0 10px rgba(134,239,172,.7);flex:0 0 8px;}
-  main{padding:26px clamp(16px,3vw,38px);max-width:1600px;margin:0 auto;}
-  .welcome-banner{position:relative;display:flex;align-items:center;gap:18px;overflow:hidden;padding:23px 26px;margin-bottom:20px;border-radius:18px;color:#fff;background:linear-gradient(115deg,#EC4899 0%,#D9469A 42%,#A855C9 100%);box-shadow:0 3px 10px rgba(190,24,93,.10);}
-  .welcome-banner:after{content:"";position:absolute;width:230px;height:230px;right:-55px;top:-115px;border-radius:50%;border:1px solid rgba(255,255,255,.2);box-shadow:0 0 0 22px rgba(255,255,255,.05),0 0 0 46px rgba(255,255,255,.04);pointer-events:none;}
-  .welcome-orb{width:49px;height:49px;display:grid;place-items:center;flex:0 0 49px;border-radius:15px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);font-size:1.55rem;}
-  .welcome-eyebrow{margin:0 0 5px;font-size:.68rem;letter-spacing:.14em;font-weight:700;color:#FFE4F1;}
-  .welcome-banner h2{margin:0;font-size:clamp(1.35rem,2.5vw,1.8rem);letter-spacing:-.035em;color:#fff;}
-  .welcome-copy{margin:6px 0 0;font-size:.88rem;color:#FFF1F7;line-height:1.5;}
-  .welcome-sparkle{margin-left:auto;align-self:flex-start;font-size:2.4rem;color:rgba(255,255,255,.65);z-index:1;}
-  .card{background:#FFFFFF;border:1px solid #F6C8DE;border-radius:16px;padding:clamp(16px,2vw,26px);box-shadow:0 2px 8px rgba(130,30,84,.05);margin-bottom:20px;}
-  h2.section-title{font-family:'Inter',sans-serif;font-size:1.12rem;font-weight:750;color:#B52E78;padding-bottom:12px;border-bottom:1px solid #F4D1E2;margin-bottom:20px;}
-  label{color:#87566F;font-size:.72rem;letter-spacing:.055em;}
-  input,select{border:1px solid #E9B8D1;border-radius:9px;background:#FFFBFD;color:#482238;padding:12px 13px;min-height:43px;transition:none;}
-  input:focus,select:focus{outline:none;border-color:#D9469A;box-shadow:0 0 0 3px rgba(217,70,154,.13);background:#fff;}
-  input[readonly]{background:#FCE7F3;color:#80516B;}
-  .btn{border-radius:9px;transition:none;}
-  .btn-primary{background:linear-gradient(110deg,#EC4899,#BE287E);color:#fff;box-shadow:0 2px 6px rgba(190,40,126,.12);}
-  .btn-primary:hover{background:linear-gradient(110deg,#DB2777,#9D246B);box-shadow:0 3px 8px rgba(190,40,126,.16);}
-  .btn-ghost{color:#B52E78;border-color:#D98CB5;}
-  .subtabs button.active,.dept-row button.active{background:linear-gradient(110deg,#EC4899,#BE287E);color:#fff;border-color:transparent;}
-  .subtabs button,.dept-row button{border-color:#D98CB5;color:#B52E78;}
-  ul.record-list li:hover{background:#FFF0F7;}
-  ul.record-list li .inv-no,.admin-row .inv-no{color:#B52E78;}
-  .stamp.pending{color:#C47A17;}
-  .printable-area th{border-bottom-color:#D9469A;color:#B52E78;}
-  .grand-total{border-top-color:#D9469A;color:#B52E78;}
-  .modal{border:1px solid #F3C7DD;}
-  @media(max-width:700px){
-    :root{--sidebar-collapsed:58px;--sidebar-expanded:min(252px,84vw);}
-    nav.tabs.sidebar{padding:12px 6px;gap:5px;}
-    nav.tabs.sidebar button{padding:10px 9px;gap:10px;min-height:43px;font-size:.82rem;}
-    .sidebar-brand{padding-left:1px}.brand-mark{width:40px;height:40px;flex-basis:40px;}
-    header.title-band{padding:17px 16px;align-items:flex-start;flex-direction:column;gap:5px;}
-    header.title-band .sub{font-size:.6rem;}
-    main{padding:18px 12px;}
-    .welcome-banner{padding:18px 16px;gap:12px;align-items:flex-start;}
-    .welcome-orb{width:40px;height:40px;flex-basis:40px;border-radius:12px;}
-    .welcome-copy{font-size:.8rem;}
-    .welcome-sparkle{display:none;}
-    .card{padding:16px;}
-  }
-  /* Performance tuning: keep the pink-gradient look while minimizing repaint work. */
-  .card{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}
-  nav.tabs.sidebar,nav.tabs.sidebar button,.btn,input,select{transition:none!important;}
-  @media(prefers-reduced-motion:reduce){.app-shell,nav.tabs.sidebar,nav.tabs.sidebar button,.btn{transition:none!important;}}
-
 </style>
 </head>
 <body>
@@ -408,26 +377,49 @@
     <div class="sub">SHBN &middot; Ledger No. Live</div>
   </header>
 
-  <nav class="tabs sidebar" id="app-sidebar" aria-label="Main navigation">
-    <div class="sidebar-brand"><span class="brand-mark">DI</span><span class="sidebar-brand-text"><strong>SHBN Invoice</strong><small>Departmental Ledger</small></span></div>
-    <button type="button" class="sidebar-pin" id="sidebar-pin" aria-pressed="false" title="Pin sidebar open"><span class="pin-symbol">📌</span><span class="sidebar-label">Pin menu open</span></button>
-    <div class="sidebar-divider"></div>
-    <button data-tab="new" class="active" title="New Entry"><span class="nav-icon">✚</span><span class="sidebar-label">New Entry</span></button>
-    <button data-tab="pending" title="Pending Invoice"><span class="nav-icon">◷</span><span class="sidebar-label">Pending Invoice</span></button>
-    <button data-tab="summary" title="Invoice Summary"><span class="nav-icon">▤</span><span class="sidebar-label">Invoice Summary</span></button>
-    <button data-tab="admin" title="Admin"><span class="nav-icon">⚙</span><span class="sidebar-label">Admin</span></button>
-    <div class="sidebar-footer"><span class="sidebar-status-dot"></span><span class="sidebar-label">SHBN internal system</span></div>
+  <nav class="tabs">
+    <button data-tab="home" class="active">Home</button>
+    <button data-tab="new">New Entry</button>
+    <button data-tab="pending">Pending Invoice</button>
+    <button data-tab="summary">Invoice Summary</button>
+    <button data-tab="admin">Admin</button>
   </nav>
 
   <main>
 
-    <!-- NEW ENTRY -->
-    <section id="panel-new" class="panel active">
-      <div class="welcome-banner">
-        <div class="welcome-orb">✦</div>
-        <div><p class="welcome-eyebrow" id="greeting-date">WELCOME TO YOUR WORKSPACE</p><h2 id="greeting-title">Good day!</h2><p class="welcome-copy">Ready to record a new departmental invoice? Let’s keep every record accurate and up to date.</p></div>
-        <div class="welcome-sparkle" aria-hidden="true">✧</div>
+    <!-- HOME -->
+    <section id="panel-home" class="panel active">
+      <div class="card home-hero">
+        <div>
+          <div class="hero-date" id="home-date"></div>
+          <h2 id="home-greeting">Hello</h2>
+          <p class="hero-line" id="home-line">Loading your dashboard...</p>
+        </div>
+        <button class="btn btn-primary" id="btn-home-new">+ New Entry</button>
       </div>
+
+      <div class="home-grid">
+        <div class="card">
+          <div class="section-head">
+            <h2 class="section-title" id="home-pending-title">Pending Invoices</h2>
+          </div>
+          <div class="pending-grid" id="home-pending-grid"></div>
+          <div class="msg error" id="home-error"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h2 class="section-title">Recent Activity</h2>
+            <button class="btn btn-ghost btn-small" id="btn-home-refresh">Refresh</button>
+          </div>
+          <ul class="activity-list" id="home-activity"></ul>
+          <div class="empty-note" id="home-activity-empty" style="display:none;">No activity yet.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEW ENTRY -->
+    <section id="panel-new" class="panel">
       <div class="card">
         <h2 class="section-title">New Invoice Entry</h2>
         <div class="field-grid">
@@ -870,14 +862,19 @@ document.addEventListener("input", (e) => {
 /* =========================================================
    Tab navigation
    ========================================================= */
-document.querySelectorAll("nav.tabs button[data-tab]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("panel-"+btn.dataset.tab).classList.add("active");
-    if(btn.dataset.tab === "pending"){ loadPending(); }
-  });
+// Single place that switches tabs, so the nav buttons and the Home
+// dashboard's shortcut buttons all behave identically.
+function activateTab(name){
+  document.querySelectorAll("nav.tabs button").forEach(b =>
+    b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + name).classList.add("active");
+  if(name === "pending"){ loadPending(); }
+  if(name === "home"){ loadHome(); }
+  window.scrollTo({ top: 0 });
+}
+document.querySelectorAll("nav.tabs button").forEach(btn => {
+  btn.addEventListener("click", () => activateTab(btn.dataset.tab));
 });
 
 document.querySelectorAll(".subtabs button").forEach(btn => {
@@ -1630,7 +1627,7 @@ function renderReport(rows, start, end){
     });
   }
   area.style.display = "";
-  area.scrollIntoView({ behavior: "auto", block: "start" });
+  area.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 document.getElementById("btn-print-report").addEventListener("click", () => {
@@ -1737,7 +1734,7 @@ function renderSummary(rows, start, end, mainDept, subDept){
 
   document.getElementById("summary-grand-total").textContent = formatMoney(grandTotal);
   area.style.display = "";
-  area.scrollIntoView({ behavior: "auto", block: "start" });
+  area.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 document.getElementById("btn-print-summary").addEventListener("click", () => {
@@ -1745,52 +1742,125 @@ document.getElementById("btn-print-summary").addEventListener("click", () => {
 });
 
 /* =========================================================
-   Collapsible sidebar + greeting for New Entry
+   HOME DASHBOARD
    ========================================================= */
-(function setupSidebar(){
-  const sidebar = document.getElementById("app-sidebar");
-  const pin = document.getElementById("sidebar-pin");
-  if(!sidebar || !pin) return;
-  let pinned = false;
-  try { pinned = localStorage.getItem("shbn-invoice-sidebar-pinned") === "1"; } catch(e) {}
-  function applyPinnedState(){
-    sidebar.classList.toggle("pinned", pinned);
-    pin.setAttribute("aria-pressed", String(pinned));
-    pin.title = pinned ? "Unpin sidebar (auto-collapse enabled)" : "Pin sidebar open";
-    const label = pin.querySelector(".sidebar-label");
-    if(label) label.textContent = pinned ? "Unpin menu" : "Pin menu open";
-  }
-  pin.addEventListener("click", function(e){
-    e.preventDefault(); e.stopPropagation();
-    pinned = !pinned;
-    try { localStorage.setItem("shbn-invoice-sidebar-pinned", pinned ? "1" : "0"); } catch(e) {}
-    applyPinnedState();
-  });
-  // On touch screens there is no hover: tapping the edge toggles temporary expansion.
-  sidebar.addEventListener("click", function(e){
-    if(window.matchMedia("(hover: none)").matches && !pinned && !e.target.closest("button[data-tab]") && !e.target.closest("#sidebar-pin")){
-      sidebar.classList.toggle("touch-open");
-    }
-  });
-  document.addEventListener("click", function(e){
-    if(window.matchMedia("(hover: none)").matches && !sidebar.contains(e.target) && !pinned) sidebar.classList.remove("touch-open");
-  });
-  applyPinnedState();
-})();
+const HOME_DEPTS = [
+  { key: "HARDLINE",    label: "Hardline" },
+  { key: "SOFTLINE",    label: "Softline" },
+  { key: "EG",          label: "EG" },
+  { key: "CONSIGNMENT", label: "Consignment" }
+];
 
-function updateNewEntryGreeting(){
-  const now = new Date();
-  const hour = now.getHours();
-  const greeting = hour < 12 ? "Good morning!" : hour < 18 ? "Good afternoon!" : "Good evening!";
-  const title = document.getElementById("greeting-title");
-  const date = document.getElementById("greeting-date");
-  if(title) title.textContent = greeting;
-  if(date) date.textContent = now.toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"}).toUpperCase();
+function greetingText(){
+  const h = new Date().getHours();
+  if(h < 12) return "Good morning";
+  if(h < 18) return "Good afternoon";
+  return "Good evening";
 }
-updateNewEntryGreeting();
+
+// "5 min ago", "3 hr ago", "2 days ago", then a plain dd.MM.yyyy date.
+function timeAgo(iso){
+  const t = new Date(iso).getTime();
+  if(isNaN(t)) return "";
+  const mins = Math.floor((Date.now() - t) / 60000);
+  if(mins < 1) return "just now";
+  if(mins < 60) return mins + " min ago";
+  const hrs = Math.floor(mins / 60);
+  if(hrs < 24) return hrs + " hr ago";
+  const days = Math.floor(hrs / 24);
+  if(days < 7) return days + (days === 1 ? " day ago" : " days ago");
+  const d = new Date(t);
+  const pad = n => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${d.getFullYear()}`;
+}
+
+function renderHome(counts, recent){
+  const total = HOME_DEPTS.reduce((sum, d) => sum + (counts[d.key] || 0), 0);
+
+  document.getElementById("home-greeting").textContent = greetingText();
+  document.getElementById("home-date").textContent =
+    new Date().toLocaleDateString("en-GB", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
+  document.getElementById("home-line").textContent = total === 0
+    ? "All caught up — there are no pending invoices."
+    : `${total} invoice${total === 1 ? " is" : "s are"} waiting to be keyed in.`;
+  document.getElementById("home-pending-title").textContent =
+    total === 0 ? "Pending Invoices" : `Pending Invoices · ${total} total`;
+
+  const grid = document.getElementById("home-pending-grid");
+  grid.innerHTML = "";
+  HOME_DEPTS.forEach(d => {
+    const n = counts[d.key] || 0;
+    const card = document.createElement("div");
+    card.className = "pending-card";
+    card.innerHTML = `
+      <div class="dept">${d.label}</div>
+      <div class="num ${n === 0 ? "zero" : ""}">${n}</div>
+      <div class="caption">${n === 0 ? "All clear" : (n === 1 ? "invoice pending" : "invoices pending")}</div>
+      <button class="btn btn-ghost btn-small">View Pending</button>
+    `;
+    card.querySelector("button").addEventListener("click", () => goToPending(d.key));
+    grid.appendChild(card);
+  });
+
+  const list = document.getElementById("home-activity");
+  const empty = document.getElementById("home-activity-empty");
+  list.innerHTML = "";
+  empty.style.display = recent.length ? "none" : "block";
+  recent.forEach(a => {
+    const li = document.createElement("li");
+    const done = a.type === "COMPLETED";
+    const who = a.by ? ` · ${escapeHtml(a.by)}` : "";
+    li.innerHTML = `
+      <span class="stamp ${done ? "completed" : "pending"}">${done ? "COMPLETED" : "ADDED"}</span>
+      <div class="body">
+        <div class="inv-no">${escapeHtml(a.inv_odo_no)}</div>
+        <div class="meta">${escapeHtml(a.supplier)} · ${escapeHtml(a.main_department)} / ${escapeHtml(a.sub_department)}${who}</div>
+      </div>
+      <span class="when" title="${escapeHtml(new Date(a.at).toLocaleString("en-GB"))}">${timeAgo(a.at)}</span>
+    `;
+    list.appendChild(li);
+  });
+}
+
+async function loadHome(){
+  const err = document.getElementById("home-error");
+  err.textContent = "";
+  let resp;
+  try{
+    resp = await callApi("homeSummary");
+  } catch(e){
+    err.textContent = "Could not load the dashboard: " + e.message;
+    return;
+  }
+  if(!resp.success){
+    err.textContent = "Could not load the dashboard: " + (resp.error || "");
+    return;
+  }
+  renderHome(resp.counts || {}, resp.recent || []);
+}
+
+// "View Pending" on a department card: open Pending Invoice with that
+// department already selected and any old search cleared.
+function goToPending(dept){
+  document.querySelectorAll(".subtabs button").forEach(b =>
+    b.classList.toggle("active", b.dataset.sub === "pending"));
+  document.getElementById("sub-pending").style.display = "";
+  document.getElementById("sub-completed").style.display = "none";
+
+  document.querySelectorAll("#pending-dept-row button").forEach(b =>
+    b.classList.toggle("active", b.dataset.dept === dept));
+  currentPendingDept = dept;
+  pendingSearchTerm = "";
+  document.getElementById("pending-search").value = "";
+
+  activateTab("pending");
+}
+
+document.getElementById("btn-home-new").addEventListener("click", () => activateTab("new"));
+document.getElementById("btn-home-refresh").addEventListener("click", loadHome);
 
 /* Initial load */
-loadPending();
+loadHome();
 </script>
 </body>
 </html>
