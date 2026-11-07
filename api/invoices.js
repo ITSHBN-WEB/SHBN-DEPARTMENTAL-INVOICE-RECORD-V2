@@ -110,6 +110,48 @@ async function countPending(pool) {
   return rows[0].count;
 }
 
+// Powers the app's Home dashboard: pending count per main department plus
+// the 6 most recent activities, in one round trip. An "activity" is an
+// invoice being ADDED (created_at) or COMPLETED (completed_at). Each half
+// is limited to 6 before the union so Postgres only has to look at the
+// newest rows via the created_at / completed_at indexes.
+async function homeSummary(pool) {
+  const [countsRes, recentRes] = await Promise.all([
+    pool.query(
+      `SELECT main_department, COUNT(*)::int AS count
+       FROM invoices WHERE status = 'PENDING' GROUP BY main_department`
+    ),
+    pool.query(
+      `SELECT * FROM (
+         (SELECT 'ADDED' AS type, inv_odo_no, supplier, main_department,
+                 sub_department, record_by AS by_user, created_at AS happened_at
+          FROM invoices ORDER BY created_at DESC LIMIT 6)
+         UNION ALL
+         (SELECT 'COMPLETED' AS type, inv_odo_no, supplier, main_department,
+                 sub_department, key_in_by AS by_user, completed_at AS happened_at
+          FROM invoices WHERE completed_at IS NOT NULL
+          ORDER BY completed_at DESC LIMIT 6)
+       ) recent
+       ORDER BY happened_at DESC LIMIT 6`
+    )
+  ]);
+
+  const counts = { HARDLINE: 0, SOFTLINE: 0, EG: 0, CONSIGNMENT: 0 };
+  countsRes.rows.forEach(r => { counts[r.main_department] = r.count; });
+
+  const recent = recentRes.rows.map(r => ({
+    type: r.type,
+    inv_odo_no: r.inv_odo_no,
+    supplier: r.supplier,
+    main_department: r.main_department,
+    sub_department: r.sub_department,
+    by: r.by_user || '',
+    at: new Date(r.happened_at).toISOString()
+  }));
+
+  return { success: true, counts, recent };
+}
+
 async function listCompleted(pool, monthsBack) {
   const { rows } = await pool.query(
     `SELECT ${SELECT_COLUMNS} FROM invoices
@@ -240,6 +282,7 @@ module.exports = async (req, res) => {
       case 'updateEntry':    result = await updateEntry(pool, body); break;
       case 'completeEntry':  result = await completeEntry(pool, body); break;
       case 'deleteEntry':    result = await deleteEntry(pool, body); break;
+      case 'homeSummary':    result = await homeSummary(pool); break;
       default: result = { success: false, error: 'Unknown action: ' + action };
     }
     res.status(200).json(result);
